@@ -10,6 +10,7 @@ public abstract class DecBase {
     private final String fileName;
 
     protected DecBase(String fileName) {
+        System.out.printf("Running %s%n", this.getClass().getSimpleName());
         this.fileName = fileName;
     }
 
