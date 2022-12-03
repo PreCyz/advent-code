@@ -1,3 +1,5 @@
+package year2022;
+
 import java.util.*;
 import java.util.stream.Stream;
 

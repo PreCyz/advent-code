@@ -1,9 +1,11 @@
+package year2022;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-abstract class DecBase {
+public abstract class DecBase {
     protected LinkedList<Integer> inputIntegers;
     private final String fileName;
 
