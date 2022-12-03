@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public abstract class DecBase {
-    protected LinkedList<Integer> inputIntegers;
+public abstract class DecBase implements Runnable {
+    protected LinkedList<String> inputStrings = new LinkedList<>();
     private final String fileName;
 
     protected DecBase(String fileName) {
-        System.out.printf("Running %s%n", this.getClass().getSimpleName());
         this.fileName = fileName;
     }
 
@@ -19,15 +18,13 @@ public abstract class DecBase {
     }
 
     protected DecBase readInput() throws IOException {
-        System.out.printf("Reading input from [%s]%n", fileName);
-        inputIntegers = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(fileName))) {
+        System.out.printf("%nReading input from [%s]%n", getFileName());
+        inputStrings = new LinkedList<>();
+        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
-                if (nextLine == null || "".equals(nextLine)) {
-                    inputIntegers.add(null);
-                } else {
-                    inputIntegers.add(Integer.parseInt(nextLine));
+                if (nextLine != null && !"".equals(nextLine)) {
+                    inputStrings.add(nextLine);
                 }
             }
         }
@@ -38,7 +35,12 @@ public abstract class DecBase {
         return fileName;
     }
 
+    @Override
+    public void run() {
+        System.out.printf("Calculating ... %s%n", this.getClass().getSimpleName());
+        calculate();
+    }
+
     protected abstract DecBase readDefaultInput();
     protected abstract void calculate();
-
 }

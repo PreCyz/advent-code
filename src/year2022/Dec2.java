@@ -1,14 +1,9 @@
 package year2022;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Dec2 extends DecBase {
-
-    private LinkedList<String> inputStrings = new LinkedList<>();
 
     private enum Actions {
         A(1, "ROCK", "") {
@@ -167,7 +162,8 @@ public class Dec2 extends DecBase {
         super(fileName);
     }
 
-    public Dec2 readDefaultInput() {
+    @Override
+    protected Dec2 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(
                 Stream.of("A Y", "B X", "C Z").toList()
@@ -176,23 +172,7 @@ public class Dec2 extends DecBase {
     }
 
     @Override
-    protected DecBase readInput() throws IOException {
-        System.out.printf("Reading input from [%s]%n", getFileName());
-        inputStrings = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
-            while (scanner.hasNext()) {
-                final String nextLine = scanner.nextLine();
-                if (nextLine != null && !"".equals(nextLine)) {
-                    inputStrings.add(nextLine);
-                }
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public void calculate() {
-        System.out.println("Calculating ...");
+    protected void calculate() {
         long totalScore = 0;
         for (String game : inputStrings) {
             final String[] players = game.split(" ");
@@ -200,7 +180,7 @@ public class Dec2 extends DecBase {
             Actions me = Actions.valueOf(players[1]);
             totalScore += me.value + me.calculateScore(opponent);
         }
-        System.out.printf("Total score %d%n", totalScore);
+        System.out.printf("Part 1 - Total score %d%n", totalScore);
 
         totalScore = 0;
         for (String game : inputStrings) {
@@ -213,10 +193,8 @@ public class Dec2 extends DecBase {
                 default -> opponent.getLoose();
             };
             totalScore += myAction.value + myAction.calculateScore(opponent);
-            /*System.out.printf("Opponent choice %s-%s, score %s, my action %s-%s, my calculateScore %d%n",
-                    opponent.name(), opponent.type, score.score, myAction.name(), myAction.type, myAction.calculateScore(opponent));*/
         }
 
-        System.out.printf("Total score %d%n", totalScore);
+        System.out.printf("Part 2 - Total score %d%n", totalScore);
     }
 }

@@ -1,9 +1,13 @@
 package year2022;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class Dec1 extends DecBase {
+
+    private LinkedList<Integer> inputIntegers;
 
     public Dec1(String fileName) {
         super(fileName);
@@ -21,8 +25,23 @@ public class Dec1 extends DecBase {
         return this;
     }
 
+    protected DecBase readInput() throws IOException {
+        System.out.printf("%nReading input from [%s]%n", getFileName());
+        inputIntegers = new LinkedList<>();
+        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
+            while (scanner.hasNext()) {
+                final String nextLine = scanner.nextLine();
+                if (nextLine == null || "".equals(nextLine)) {
+                    inputIntegers.add(null);
+                } else {
+                    inputIntegers.add(Integer.parseInt(nextLine));
+                }
+            }
+        }
+        return this;
+    }
+
     public void calculate() {
-        System.out.println("Calculating ...");
         ArrayList<Long> sums = new ArrayList<>();
         long calSum = 0;
         int dwarfWithMaxSum = 1;

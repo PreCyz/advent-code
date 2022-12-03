@@ -1,13 +1,9 @@
 package year2022;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Dec3 extends DecBase {
-
-    private LinkedList<String> inputStrings = new LinkedList<>();
+public class Dec3 extends Dec2 {
 
     protected Dec3() {
         super();
@@ -17,8 +13,9 @@ public class Dec3 extends DecBase {
         super(fileName);
     }
 
-    public Dec3 readDefaultInput() {
-        System.out.println("Reading default input.");
+    @Override
+    protected Dec3 readDefaultInput() {
+        System.out.println("Reading default input");
         inputStrings = new LinkedList<>(
                 Stream.of("vJrwpWtwJgWrhcsFMMfFFhFp",
                         "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
@@ -31,23 +28,8 @@ public class Dec3 extends DecBase {
         return this;
     }
 
-    protected DecBase readInput() throws IOException {
-        System.out.printf("Reading input from [%s]%n", getFileName());
-        inputStrings = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
-            while (scanner.hasNext()) {
-                final String line = scanner.nextLine();
-                if (line != null && !"".equals(line)) {
-                    inputStrings.add(line);
-                }
-            }
-            System.out.printf("Input size %d%n", inputStrings.size());
-        }
-        return this;
-    }
-
-    public void calculate() {
-        System.out.println("Calculating ...");
+    @Override
+    protected void calculate() {
         long sum = 0;
         for (String rucksack : inputStrings) {
             Map<String, Integer> compartment1 = new HashMap<>();
@@ -68,7 +50,7 @@ public class Dec3 extends DecBase {
                 }
             }
         }
-        System.out.println(sum);
+        System.out.printf("Part 1: %d%n", sum);
 
         sum = 0;
         int idx = 1;
@@ -112,7 +94,7 @@ public class Dec3 extends DecBase {
                 idx++;
             }
         }
-        System.out.println(sum);
+        System.out.printf("Part 2: %d%n", sum);
 
     }
 
