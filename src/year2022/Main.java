@@ -1,15 +1,19 @@
 package year2022;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
+        Path inputs = Paths.get("", "inputs");
+
         List<DecBase> adventTasks = List.of(
-                //new Dec1("C:\\work\\workspace\\advent-code\\inputs\\dec_1.txt"),
-                //new Dec2("C:\\work\\workspace\\advent-code\\inputs\\dec_2.txt"),
-                //new Dec3("C:\\work\\workspace\\advent-code\\inputs\\dec_3.txt"),
-                new Dec4("C:\\work\\workspace\\advent-code\\inputs\\dec_4.txt")
+                new Dec1(Paths.get(inputs.toString(),"dec_1.txt").toAbsolutePath().normalize().toString()),
+                new Dec2(Paths.get(inputs.toString(),"dec_2.txt").toAbsolutePath().normalize().toString()),
+                new Dec3(Paths.get(inputs.toString(),"dec_3.txt").toAbsolutePath().normalize().toString()),
+                new Dec4(Paths.get(inputs.toString(),"dec_4.txt").toAbsolutePath().normalize().toString())
         );
 
         for (DecBase task : adventTasks) {
