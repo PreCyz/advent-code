@@ -1,9 +1,11 @@
 package year2022;
 
+import base.DecBase;
+
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-public class Dec2 extends DecBase {
+class Dec2 extends DecBase {
 
     private enum Actions {
         A(1, "ROCK", "") {
@@ -159,7 +161,7 @@ public class Dec2 extends DecBase {
     }
 
     @Override
-    protected Dec2 readDefaultInput() {
+    public Dec2 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(
                 Stream.of("A Y", "B X", "C Z").toList()

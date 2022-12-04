@@ -1,4 +1,4 @@
-package year2022;
+package base;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public abstract class DecBase implements Runnable {
         this("");
     }
 
-    protected DecBase readInput() throws IOException {
+    public DecBase readInput() throws IOException {
         System.out.printf("%nReading input from [%s]%n", getFileName());
         inputStrings = new LinkedList<>();
         try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
@@ -46,6 +46,6 @@ public abstract class DecBase implements Runnable {
         System.out.println("No need to implement method calculatePart2.");
     }
 
-    protected abstract DecBase readDefaultInput();
+    public abstract DecBase readDefaultInput();
     protected abstract void calculatePart1();
 }

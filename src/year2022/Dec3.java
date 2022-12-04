@@ -3,14 +3,14 @@ package year2022;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Dec3 extends Dec2 {
+class Dec3 extends Dec2 {
 
     public Dec3(String fileName) {
         super(fileName);
     }
 
     @Override
-    protected Dec3 readDefaultInput() {
+    public Dec3 readDefaultInput() {
         System.out.println("Reading default input");
         inputStrings = new LinkedList<>(
                 Stream.of("vJrwpWtwJgWrhcsFMMfFFhFp",

@@ -1,16 +1,18 @@
 package year2022;
 
+import base.DecBase;
+
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-public class Dec4 extends DecBase {
+class Dec4 extends DecBase {
 
     public Dec4(String fileName) {
         super(fileName);
     }
 
     @Override
-    protected Dec4 readDefaultInput() {
+    public Dec4 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(
                 Stream.of("2-4,6-8",

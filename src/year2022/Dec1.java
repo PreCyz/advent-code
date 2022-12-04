@@ -1,11 +1,13 @@
 package year2022;
 
+import base.DecBase;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Dec1 extends DecBase {
+class Dec1 extends DecBase {
 
     private LinkedList<Integer> inputIntegers;
 
@@ -13,6 +15,7 @@ public class Dec1 extends DecBase {
         super(fileName);
     }
 
+    @Override
     public Dec1 readDefaultInput() {
         System.out.println("Reading default input.");
         inputIntegers = new LinkedList<>(
@@ -21,7 +24,7 @@ public class Dec1 extends DecBase {
         return this;
     }
 
-    protected DecBase readInput() throws IOException {
+    public DecBase readInput() throws IOException {
         System.out.printf("%nReading input from [%s]%n", getFileName());
         inputIntegers = new LinkedList<>();
         try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
