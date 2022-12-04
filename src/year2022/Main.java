@@ -6,9 +6,10 @@ public class Main {
 
     public static void main(String[] args) {
         List<DecBase> adventTasks = List.of(
-                new Dec1("C:\\work\\workspace\\advent-code\\inputs\\dec_1.txt"),
-                new Dec2("C:\\work\\workspace\\advent-code\\inputs\\dec_2.txt"),
-                new Dec3("C:\\work\\workspace\\advent-code\\inputs\\dec_3.txt")
+                //new Dec1("C:\\work\\workspace\\advent-code\\inputs\\dec_1.txt"),
+                //new Dec2("C:\\work\\workspace\\advent-code\\inputs\\dec_2.txt"),
+                //new Dec3("C:\\work\\workspace\\advent-code\\inputs\\dec_3.txt"),
+                new Dec4("C:\\work\\workspace\\advent-code\\inputs\\dec_4.txt")
         );
 
         for (DecBase task : adventTasks) {
