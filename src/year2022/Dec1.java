@@ -37,7 +37,8 @@ public class Dec1 extends DecBase {
         return this;
     }
 
-    public void calculate() {
+    @Override
+    protected void calculatePart1() {
         ArrayList<Long> sums = new ArrayList<>();
         long calSum = 0;
         int dwarfWithMaxSum = 1;

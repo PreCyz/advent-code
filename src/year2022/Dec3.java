@@ -25,7 +25,7 @@ public class Dec3 extends Dec2 {
     }
 
     @Override
-    protected void calculate() {
+    protected void calculatePart1() {
         long sum = 0;
         for (String rucksack : inputStrings) {
             Map<String, Integer> compartment1 = new HashMap<>();
@@ -47,8 +47,11 @@ public class Dec3 extends Dec2 {
             }
         }
         System.out.printf("Part 1: %d%n", sum);
+    }
 
-        sum = 0;
+    @Override
+    protected void calculatePart2() {
+        long sum = 0;
         int idx = 1;
         Map<String, Integer> rucksack1 = new HashMap<>();
         Map<String, Integer> rucksack2 = new HashMap<>();
@@ -74,7 +77,6 @@ public class Dec3 extends Dec2 {
                 }
             }
 
-
             if (idx == 3) {
                 for (Map.Entry<String, Integer> entry : rucksack1.entrySet()) {
                     if (rucksack2.containsKey(entry.getKey()) && rucksack3.containsKey(entry.getKey())) {
@@ -91,7 +93,6 @@ public class Dec3 extends Dec2 {
             }
         }
         System.out.printf("Part 2: %d%n", sum);
-
     }
 
     private Map<String, Integer> priorityMap() {

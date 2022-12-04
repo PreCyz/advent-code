@@ -25,7 +25,7 @@ public class Dec4 extends DecBase {
     }
 
     @Override
-    protected void calculate() {
+    protected void calculatePart1() {
         long totalContains = 0;
         long totalPairOverlap = 0;
         for (String pair: inputStrings) {

@@ -168,7 +168,7 @@ public class Dec2 extends DecBase {
     }
 
     @Override
-    protected void calculate() {
+    protected void calculatePart1() {
         long totalScore = 0;
         for (String game : inputStrings) {
             final String[] players = game.split(" ");
@@ -177,8 +177,11 @@ public class Dec2 extends DecBase {
             totalScore += me.value + me.calculateScore(opponent);
         }
         System.out.printf("Part 1 - Total score %d%n", totalScore);
+    }
 
-        totalScore = 0;
+    @Override
+    protected void calculatePart2() {
+        long totalScore = 0;
         for (String game : inputStrings) {
             final String[] players = game.split(" ");
             Actions opponent = Actions.valueOf(players[0]);
@@ -190,7 +193,6 @@ public class Dec2 extends DecBase {
             };
             totalScore += myAction.value + myAction.calculateScore(opponent);
         }
-
         System.out.printf("Part 2 - Total score %d%n", totalScore);
     }
 }

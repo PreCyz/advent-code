@@ -20,7 +20,6 @@ public class Dec5 extends DecBase {
     }
 
     @Override
-    protected void calculate() {
-
+    protected void calculatePart1() {
     }
 }

@@ -38,9 +38,14 @@ public abstract class DecBase implements Runnable {
     @Override
     public void run() {
         System.out.printf("Calculating ... %s%n", this.getClass().getSimpleName());
-        calculate();
+        calculatePart1();
+        calculatePart2();
+    }
+
+    protected void calculatePart2() {
+        System.out.println("No need to implement method calculatePart2.");
     }
 
     protected abstract DecBase readDefaultInput();
-    protected abstract void calculate();
+    protected abstract void calculatePart1();
 }
