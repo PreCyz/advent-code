@@ -13,10 +13,6 @@ public class Dec1 extends DecBase {
         super(fileName);
     }
 
-    protected Dec1() {
-        super();
-    }
-
     public Dec1 readDefaultInput() {
         System.out.println("Reading default input.");
         inputIntegers = new LinkedList<>(

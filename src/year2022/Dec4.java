@@ -5,10 +5,6 @@ import java.util.stream.Stream;
 
 public class Dec4 extends DecBase {
 
-    protected Dec4() {
-        super();
-    }
-
     public Dec4(String fileName) {
         super(fileName);
     }

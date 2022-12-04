@@ -154,10 +154,6 @@ public class Dec2 extends DecBase {
         abstract Actions getLoose();
     }
 
-    protected Dec2() {
-        super();
-    }
-
     public Dec2(String fileName) {
         super(fileName);
     }
