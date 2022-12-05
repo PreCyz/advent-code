@@ -18,17 +18,7 @@ public class Main2015 {
 
         );
 
-        for (DecBase task : adventTasks) {
-            try {
-                System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
-                System.out.printf("*******************************%n");
-                task.readDefaultInput().run();
-                task.readInput().run();
-                System.out.printf("*******************************%n");
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-        }
+        DecBase.runTasks(adventTasks);
     }
 }
 

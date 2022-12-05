@@ -2,8 +2,7 @@ package base;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();
@@ -48,4 +47,18 @@ public abstract class DecBase implements Runnable {
 
     public abstract DecBase readDefaultInput();
     protected abstract void calculatePart1();
+
+    public static void runTasks(List<DecBase> adventTasks) {
+        for (DecBase task : adventTasks) {
+            try {
+                System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
+                System.out.printf("*******************************%n");
+                task.readDefaultInput().run();
+                task.readInput().run();
+                System.out.printf("*******************************%n");
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
 }

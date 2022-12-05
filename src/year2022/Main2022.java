@@ -16,20 +16,11 @@ public class Main2022 {
                 //new Dec2(Paths.get(inputs.toString(),"dec_2.txt").toAbsolutePath().normalize().toString()),
                 //new Dec3(Paths.get(inputs.toString(),"dec_3.txt").toAbsolutePath().normalize().toString()),
                 //new Dec4(Paths.get(inputs.toString(),"dec_4.txt").toAbsolutePath().normalize().toString()),
-                new Dec5(Paths.get(inputs.toString(),"dec_5.txt").toAbsolutePath().normalize().toString())
+                //new Dec5(Paths.get(inputs.toString(),"dec_5.txt").toAbsolutePath().normalize().toString())
+                new Dec6(Paths.get(inputs.toString(),"dec_6.txt").toAbsolutePath().normalize().toString())
         );
 
-        for (DecBase task : adventTasks) {
-            try {
-                System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
-                System.out.printf("*******************************%n");
-                task.readDefaultInput().run();
-                task.readInput().run();
-                System.out.printf("*******************************%n");
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-        }
+        DecBase.runTasks(adventTasks);
     }
 }
 
