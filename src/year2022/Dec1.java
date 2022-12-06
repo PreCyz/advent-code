@@ -18,9 +18,9 @@ class Dec1 extends DecBase {
     @Override
     public Dec1 readDefaultInput() {
         System.out.println("Reading default input.");
-        inputIntegers = new LinkedList<>(
-                Stream.of(1000, 2000, 3000, null, 4000, null, 5000, 6000, null, 7000, 8000, 9000, null, 10000).toList()
-        );
+        inputIntegers = new LinkedList<>(Stream.of(
+                1000, 2000, 3000, null, 4000, null, 5000, 6000, null, 7000, 8000, 9000, null, 10000
+        ).toList());
         return this;
     }
 

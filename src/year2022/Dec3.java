@@ -12,15 +12,14 @@ class Dec3 extends Dec2 {
     @Override
     public Dec3 readDefaultInput() {
         System.out.println("Reading default input");
-        inputStrings = new LinkedList<>(
-                Stream.of("vJrwpWtwJgWrhcsFMMfFFhFp",
-                        "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
-                        "PmmdzqPrVvPwwTWBwg",
-                        "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
-                        "ttgJtRGJQctTZtZT",
-                        "CrZsJsPPZsGzwwsLwLmpwMDw")
-                        .toList()
-        );
+        inputStrings = new LinkedList<>(Stream.of(
+                "vJrwpWtwJgWrhcsFMMfFFhFp",
+                "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+                "PmmdzqPrVvPwwTWBwg",
+                "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+                "ttgJtRGJQctTZtZT",
+                "CrZsJsPPZsGzwwsLwLmpwMDw"
+        ).toList());
         return this;
     }
 

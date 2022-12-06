@@ -15,15 +15,13 @@ class Dec6 extends DecBase {
     @Override
     public Dec6 readDefaultInput() {
         System.out.println("Reading default input.");
-        inputStrings = new LinkedList<>(
-                Stream.of("mjqjpqmgbljsphdztnvjfqwrcgsmlb",
-                                "bvwbjplbgvbhsrlpgdmjqwftvncz",
-                                "nppdvjthqldpwncqszvftbrmjlhg",
-                                "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg",
-                                "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
-                        )
-                        .toList()
-        );
+        inputStrings = new LinkedList<>(Stream.of(
+                "mjqjpqmgbljsphdztnvjfqwrcgsmlb",
+                "bvwbjplbgvbhsrlpgdmjqwftvncz",
+                "nppdvjthqldpwncqszvftbrmjlhg",
+                "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg",
+                "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
+        ).toList());
         return this;
     }
 

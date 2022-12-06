@@ -163,9 +163,7 @@ class Dec2 extends DecBase {
     @Override
     public Dec2 readDefaultInput() {
         System.out.println("Reading default input.");
-        inputStrings = new LinkedList<>(
-                Stream.of("A Y", "B X", "C Z").toList()
-        );
+        inputStrings = new LinkedList<>(Stream.of("A Y", "B X", "C Z").toList());
         return this;
     }
 
