@@ -14,7 +14,8 @@ public class Main2015 {
         List<DecBase> adventTasks = List.of(
                 //new Dec1(Paths.get(inputs.toString(),"dec_1.txt").toAbsolutePath().normalize().toString()),
                 //new Dec2(Paths.get(inputs.toString(),"dec_2.txt").toAbsolutePath().normalize().toString()),
-                new Dec3(Paths.get(inputs.toString(),"dec_3.txt").toAbsolutePath().normalize().toString())
+                //new Dec3(Paths.get(inputs.toString(),"dec_3.txt").toAbsolutePath().normalize().toString()),
+                new Dec4(Paths.get(inputs.toString(),"dec_4.txt").toAbsolutePath().normalize().toString())
 
         );
 
