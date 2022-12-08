@@ -18,7 +18,8 @@ public class Main2022 {
                 //new Dec4(Paths.get(inputs.toString(),"dec_4.txt").toAbsolutePath().normalize().toString()),
                 //new Dec5(Paths.get(inputs.toString(),"dec_5.txt").toAbsolutePath().normalize().toString())
                 //new Dec6(Paths.get(inputs.toString(),"dec_6.txt").toAbsolutePath().normalize().toString()),
-                new Dec7(Paths.get(inputs.toString(),"dec_7.txt").toAbsolutePath().normalize().toString())
+                //new Dec7(Paths.get(inputs.toString(),"dec_7.txt").toAbsolutePath().normalize().toString()),
+                new Dec8(Paths.get(inputs.toString(),"dec_8.txt").toAbsolutePath().normalize().toString())
         );
 
         DecBase.runTasks(adventTasks);
