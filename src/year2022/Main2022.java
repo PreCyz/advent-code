@@ -1,25 +1,32 @@
 package year2022;
 
 import base.DecBase;
+import utils.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main2022 {
 
     public static void main(String[] args) {
-        Path inputs = Paths.get("", "inputs", "2022");
+        Path inputsDir = Paths.get("", "inputs", "2022");
+        if (args != null) {
+            System.out.printf("Args taken from the launch arguments: %s%n", Arrays.asList(args));
+            inputsDir = Paths.get("", args);
+        }
 
         List<DecBase> adventTasks = List.of(
-                //new Dec1(Paths.get(inputs.toString(),"dec_1.txt").toAbsolutePath().normalize().toString()),
-                //new Dec2(Paths.get(inputs.toString(),"dec_2.txt").toAbsolutePath().normalize().toString()),
-                //new Dec3(Paths.get(inputs.toString(),"dec_3.txt").toAbsolutePath().normalize().toString()),
-                //new Dec4(Paths.get(inputs.toString(),"dec_4.txt").toAbsolutePath().normalize().toString()),
-                //new Dec5(Paths.get(inputs.toString(),"dec_5.txt").toAbsolutePath().normalize().toString())
-                //new Dec6(Paths.get(inputs.toString(),"dec_6.txt").toAbsolutePath().normalize().toString()),
-                //new Dec7(Paths.get(inputs.toString(),"dec_7.txt").toAbsolutePath().normalize().toString()),
-                new Dec8(Paths.get(inputs.toString(),"dec_8.txt").toAbsolutePath().normalize().toString())
+//                new Dec1(Utils.getFilePath(inputsDir, "dec_1.txt")),
+//                new Dec2(Utils.getFilePath(inputsDir, "dec_2.txt")),
+//                new Dec3(Utils.getFilePath(inputsDir, "dec_3.txt")),
+//                new Dec4(Utils.getFilePath(inputsDir, "dec_4.txt")),
+//                new Dec5(Utils.getFilePath(inputsDir, "dec_5.txt")),
+//                new Dec6(Utils.getFilePath(inputsDir, "dec_6.txt")),
+//                new Dec7(Utils.getFilePath(inputsDir, "dec_7.txt")),
+//                new Dec8(Utils.getFilePath(inputsDir, "dec_8.txt")),
+                new Dec9(Utils.getFilePath(inputsDir, "dec_9.txt"))
         );
 
         DecBase.runTasks(adventTasks);
