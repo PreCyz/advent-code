@@ -1,7 +1,6 @@
 package year2022;
 
 import base.DecBase;
-import utils.Utils;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -47,7 +46,7 @@ class Dec9 extends DecBase {
                 .mapToInt(r -> Integer.parseInt(r.split(" ")[1]))
                 .sum();
 
-        int gridLength = Math.max(xLength, yLength);
+        int gridLength = 2 * Math.max(xLength, yLength);
         String[][] grid = new String[gridLength][gridLength];
         initGrid(grid, gridLength);
 
@@ -105,8 +104,8 @@ class Dec9 extends DecBase {
                     tmpHead = tail;
                 }
                 visitedMap.put(tmpHead.key(), tmpHead);
-                printGrid2(grid);
-                printGrid(grid);
+                //printGrid2(grid, gridLength);
+                //printGrid(grid, gridLength);
             }
             //System.out.println(line + " step " + step + " knot " + knotNo);
             //System.out.println(line);
@@ -188,7 +187,7 @@ class Dec9 extends DecBase {
 //                "U 20"
 //        ).toList());
 
-        calculate(10, "Part 2");
+        calculate(10, "Part 2 [2493]");
     }
 
     private void print3(int gridLength, ArrayList<Knot> knots) {
@@ -202,7 +201,6 @@ class Dec9 extends DecBase {
     }
 
     void updateGrid(String[][] grid, int x, int y, String value) {
-        grid = Utils.adjustGrid(grid, x, y);
         if (!TAIL.equals(grid[x][y])) {
             grid[x][y] = value;
         }
