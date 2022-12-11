@@ -88,24 +88,26 @@ class Dec9 extends DecBase {
                     //diagonal move y-wise
                     if (Math.abs(tmpHead.y - tail.y) > 1 && Math.abs(tmpHead.x - tail.x) > 0) {
                         tail.y += tmpHead.y - tail.y + (tmpHead.y > tail.y ? -1 : 1);
-                        tail.x = Math.abs(tmpHead.x - tail.x) > 1 ? tmpHead.x - 1 : tmpHead.x;
+                        tail.x = tmpHead.x;
                         //diagonal move x-wise
                     } else if (Math.abs(tmpHead.x - tail.x) > 1 && Math.abs(tmpHead.y - tail.y) > 0) {
                         tail.x += tmpHead.x - tail.x + (tmpHead.x > tail.x ? -1 : 1);
-                        tail.y = Math.abs(tmpHead.y - tail.y) > 1 ? tmpHead.y - 1 : tmpHead.y;
+                        tail.y = tmpHead.y;
                         // move only y-wise
                     } else if (Math.abs(tmpHead.y - tail.y) > 1) {
                         tail.y += tmpHead.y - tail.y + (tmpHead.y > tail.y ? -1 : 1);
+                        tail.x = tmpHead.x;
                         //move only x-wise
                     } else if (Math.abs(tmpHead.x - tail.x) > 1) {
                         tail.x += tmpHead.x - tail.x + (tmpHead.x > tail.x ? -1 : 1);
+                        tail.y = tmpHead.y;
                     }
                     updateGrid(grid, tail.x, tail.y, String.valueOf(tail.id));
                     tmpHead = tail;
                 }
                 visitedMap.put(tmpHead.key(), tmpHead);
-                //printGrid2(grid, gridLength);
-                //printGrid(grid, gridLength);
+                //printGrid2(grid);
+                printGrid(grid);
             }
             //System.out.println(line + " step " + step + " knot " + knotNo);
             //System.out.println(line);
