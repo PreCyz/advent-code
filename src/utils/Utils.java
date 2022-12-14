@@ -80,4 +80,13 @@ public final class Utils {
         }
     }
 
+    public static void printGrid(char[][] grid) {
+        for (int y = grid[0].length - 1; y >= 0; y--) {
+            for (int x = 0; x < grid.length; x++) {
+                System.out.print(grid[x][y]);
+            }
+            System.out.println();
+        }
+    }
+
 }

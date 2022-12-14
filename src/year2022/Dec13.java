@@ -46,19 +46,41 @@ class Dec13 extends DecBase {
         return this;
     }
 
+    static class Terminator extends Exception {
+        Result result;
+
+        Terminator(Result result) {
+            super(result.name());
+            this.result = result;
+        }
+    }
+
+    enum Result {
+        RIGHT, WRONG, NO_IDEA;
+
+        Result and(Result result) {
+            if (this == WRONG || result == WRONG) {
+                return WRONG;
+            } else if (this == NO_IDEA) {
+                return result;
+            }
+            return this;
+        }
+    }
+
     record Pair(Packet left, Packet right) {
     }
 
-
     static class Packet {
         LinkedList<Object> list;
+        String value;
 
         Packet() {
             list = new LinkedList<>();
         }
 
         Packet init(String value) {
-            //System.out.println(value);
+            this.value = value;
             list.addAll(createObject(value.substring(1, value.lastIndexOf("]"))));
             return this;
         }
@@ -146,11 +168,12 @@ class Dec13 extends DecBase {
         for (int i = 0; i < pairs.size(); i++) {
             Pair pair = pairs.get(i);
             try {
-                if (rightOrder(pair.left.list, pair.right.list)) {
+                final Result result = rightOrder(pair.left.list, pair.right.list);
+                if (result == Result.RIGHT) {
                     indices.add(i + 1);
                 }
-            }catch (Exception e) {
-                if (Boolean.parseBoolean(e.getMessage())) {
+            } catch (Terminator e) {
+                if (e.result == Result.RIGHT) {
                     indices.add(i + 1);
                 }
             }
@@ -159,18 +182,20 @@ class Dec13 extends DecBase {
 
     }
 
-    boolean rightOrder(LinkedList<Object> left, LinkedList<Object> right) throws Exception {
+    Result rightOrder(LinkedList<Object> left, LinkedList<Object> right) throws Terminator {
         if (left.isEmpty() && !right.isEmpty()) {
-            throw new Exception("" + true);
+            throw new Terminator(Result.RIGHT);
         } else if (!left.isEmpty() && right.isEmpty()) {
-            throw new Exception("" + false);
+            throw new Terminator(Result.WRONG);
         } else if (left.isEmpty()) {
-            return true;
+            return Result.NO_IDEA;
         }
-        boolean result = true;
+        Result result = Result.NO_IDEA;
+        final Iterator<Object> lIter = left.iterator();
+        final Iterator<Object> rIter = right.iterator();
         while (!left.isEmpty()) {
             if (right.isEmpty()) {
-                throw new Exception("" + false);
+                throw new Terminator(Result.WRONG);
             }
 
             final Object leftEl = left.removeFirst();
@@ -180,19 +205,87 @@ class Dec13 extends DecBase {
                 int rInt = Integer.class.cast(rightEl).intValue();
                 if (lInt != rInt) {
                     if (lInt > rInt) {
-                        throw new Exception("" + false);
+                        throw new Terminator(Result.WRONG);
                     } else {
-                        throw new Exception("" + true);
+                        throw new Terminator(Result.RIGHT);
                     }
                 }
             } else if (leftEl instanceof LinkedList<?> && rightEl instanceof Integer) {
-                result &= rightOrder(LinkedList.class.cast(leftEl), new LinkedList<>(List.of(rightEl)));
+                result = result.and(rightOrder(LinkedList.class.cast(leftEl), new LinkedList<>(List.of(rightEl))));
             } else if (leftEl instanceof Integer && rightEl instanceof LinkedList<?>) {
-                result &= rightOrder(new LinkedList<>(List.of(leftEl)), LinkedList.class.cast(rightEl));
+                result = result.and(rightOrder(new LinkedList<>(List.of(leftEl)), LinkedList.class.cast(rightEl)));
             } else if (leftEl instanceof LinkedList<?> && rightEl instanceof LinkedList<?>) {
-                result &= rightOrder(LinkedList.class.cast(leftEl), LinkedList.class.cast(rightEl));
+                result = result.and(rightOrder(LinkedList.class.cast(leftEl), LinkedList.class.cast(rightEl)));
+            }
+            if (left.isEmpty() && !right.isEmpty()) {
+                throw new Terminator(Result.RIGHT);
             }
         }
         return result;
+    }
+
+    @Override
+    protected void calculatePart2() {
+        final Iterator<String> iterator = inputStrings.iterator();
+        ArrayList<Packet> packets = new ArrayList<>();
+        packets.add(new Packet().init("[[2]]"));
+        packets.add(new Packet().init("[[6]]"));
+        while (iterator.hasNext()) {
+            final String line = iterator.next();
+            if (!line.isEmpty()) {
+                packets.add(new Packet().init(line));
+            }
+        }
+
+        ArrayList<Packet> sorted = getSorted(packets);
+
+        int result = 1;
+        for (int i = 0; i < sorted.size(); i++) {
+            final Packet packet = sorted.get(i);
+            if ("[[2]]".equals(packet.value) || "[[6]]".equals(packet.value)) {
+                result *= (i + 1);
+            }
+        }
+        System.out.println("Part 2: " + result);
+    }
+
+    private ArrayList<Packet> getSorted(ArrayList<Packet> packets) {
+        ArrayList<Packet> sorted = new ArrayList<>(packets.size());
+        for (Packet packet : packets) {
+            LinkedList<Packet> tmp = new LinkedList<>();
+            if (sorted.isEmpty()) {
+                sorted.add(packet);
+            } else {
+                boolean wasPacketAdded = false;
+                for (Packet value : sorted) {
+                    try {
+                        final Result result = rightOrder(packet.list, value.list);
+                        if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(result)) {
+                            tmp.add(value);
+                            tmp.add(packet);
+                            wasPacketAdded = true;
+                        } else {
+                            tmp.add(value);
+                        }
+                    } catch (Terminator e) {
+                        if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(e.result)) {
+                            tmp.add(value);
+                            tmp.add(packet);
+                            wasPacketAdded = true;
+                        } else {
+                            tmp.add(value);
+                        }
+                    }
+                }
+                if (wasPacketAdded) {
+                    sorted.clear();
+                    sorted.addAll(tmp);
+                } else {
+                    sorted.add(packet);
+                }
+            }
+
+        }
+        return sorted;
     }
 }
