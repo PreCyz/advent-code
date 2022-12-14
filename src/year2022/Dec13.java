@@ -38,10 +38,6 @@ class Dec13 extends DecBase {
                 "",
                 "[1,[2,[3,[4,[5,6,7]]]],8,9]",
                 "[1,[2,[3,[4,[5,6,0]]]],8,9]"
-//                "[[10],[6]]",
-//                "[[4,10,[[4,2,2,1,9],8,[6,3,0],[3,4,6,7]]],[[5,5,[4],6],3],[[],10,5,9],[5,10]]"
-//                "[[],[[[4,2,0],[7,6,9,3],[6,0,0,7],1]],[],[[5,5,5,[3]],8],[[3,1,[5,9],9,[7]],7,8,[[10,1,6,4],10]]]",
-//"[[[[]],[[0],[],[3,4,10]]],[],[1,8,[7,6],[]],[[],[[1,4,8,0,7],5,[4,9,2,4,9],[3,6,7,9]],[[0,8,8,1,7],2,[0,8,9,4],[6,5,8,0],4],7,7],[3,[[2,4,6,0,10],6,[0,3],0,3]]]"
         ).toList());
         return this;
     }
@@ -68,8 +64,7 @@ class Dec13 extends DecBase {
         }
     }
 
-    record Pair(Packet left, Packet right) {
-    }
+    record Pair(Packet left, Packet right) { }
 
     static class Packet {
         LinkedList<Object> list;
@@ -102,6 +97,7 @@ class Dec13 extends DecBase {
         }
 
         LinkedList<Object> createObject(String value) {
+
             if (value.startsWith("[")) {
                 LinkedList<Object> result = new LinkedList<>();
                 int closingBracketIdx = findClosingBracket(value);
@@ -110,6 +106,7 @@ class Dec13 extends DecBase {
                     result.addAll(createObject(value.substring(closingBracketIdx + 1)));
                 }
                 return result;
+
             } else if (!value.isEmpty()) {
 
                 if (value.startsWith(",")) {
@@ -126,9 +123,10 @@ class Dec13 extends DecBase {
                             result.add(Integer.parseInt(digit));
                         }
                     }
-                    result.addAll(createObject(value.substring(openBracket)));
-                    return result;
 
+                    result.addAll(createObject(value.substring(openBracket)));
+
+                    return result;
                 } else if (openBracket == 0) {
                     final int closingBracketIdx = findClosingBracket(value);
                     if (!value.substring(closingBracketIdx + 1).isEmpty()) {
@@ -149,7 +147,6 @@ class Dec13 extends DecBase {
             }
             return new LinkedList<>();
         }
-
     }
 
     @Override
@@ -162,7 +159,7 @@ class Dec13 extends DecBase {
                 pairs.add(new Pair(new Packet().init(line), new Packet().init(iterator.next())));
             }
         }
-        System.out.println(pairs.size());
+        System.out.printf("Pair size %d%n", pairs.size());
 
         LinkedList<Integer> indices = new LinkedList<>();
         for (int i = 0; i < pairs.size(); i++) {
@@ -178,8 +175,7 @@ class Dec13 extends DecBase {
                 }
             }
         }
-        System.out.println("Part 1: " + indices.stream().mapToInt(it -> it).sum());
-
+        System.out.printf("Part 1: %d%n", indices.stream().mapToInt(it -> it).sum());
     }
 
     Result rightOrder(LinkedList<Object> left, LinkedList<Object> right) throws Terminator {
@@ -193,13 +189,13 @@ class Dec13 extends DecBase {
         Result result = Result.NO_IDEA;
         final Iterator<Object> lIter = left.iterator();
         final Iterator<Object> rIter = right.iterator();
-        while (!left.isEmpty()) {
-            if (right.isEmpty()) {
+        while (lIter.hasNext()) {
+            if (!rIter.hasNext()) {
                 throw new Terminator(Result.WRONG);
             }
 
-            final Object leftEl = left.removeFirst();
-            final Object rightEl = right.removeFirst();
+            final Object leftEl = lIter.next();
+            final Object rightEl = rIter.next();
             if (leftEl instanceof Integer && rightEl instanceof Integer) {
                 int lInt = Integer.class.cast(leftEl).intValue();
                 int rInt = Integer.class.cast(rightEl).intValue();
@@ -217,7 +213,7 @@ class Dec13 extends DecBase {
             } else if (leftEl instanceof LinkedList<?> && rightEl instanceof LinkedList<?>) {
                 result = result.and(rightOrder(LinkedList.class.cast(leftEl), LinkedList.class.cast(rightEl)));
             }
-            if (left.isEmpty() && !right.isEmpty()) {
+            if (!lIter.hasNext() && rIter.hasNext()) {
                 throw new Terminator(Result.RIGHT);
             }
         }
@@ -246,7 +242,7 @@ class Dec13 extends DecBase {
                 result *= (i + 1);
             }
         }
-        System.out.println("Part 2: " + result);
+        System.out.printf("Part 2: %d%n", result);
     }
 
     private ArrayList<Packet> getSorted(ArrayList<Packet> packets) {
@@ -258,33 +254,28 @@ class Dec13 extends DecBase {
             } else {
                 boolean wasPacketAdded = false;
                 for (Packet value : sorted) {
-                    try {
-                        final Result result = rightOrder(packet.list, value.list);
-                        if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(result)) {
-                            tmp.add(value);
-                            tmp.add(packet);
-                            wasPacketAdded = true;
-                        } else {
-                            tmp.add(value);
-                        }
-                    } catch (Terminator e) {
-                        if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(e.result)) {
-                            tmp.add(value);
-                            tmp.add(packet);
-                            wasPacketAdded = true;
-                        } else {
-                            tmp.add(value);
+                    if (!wasPacketAdded) {
+                        try {
+                            final Result result = rightOrder(packet.list, value.list);
+                            if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(result)) {
+                                tmp.add(packet);
+                                wasPacketAdded = true;
+                            }
+                        } catch (Terminator e) {
+                            if (EnumSet.of(Result.RIGHT, Result.NO_IDEA).contains(e.result)) {
+                                tmp.add(packet);
+                                wasPacketAdded = true;
+                            }
                         }
                     }
+                    tmp.add(value);
                 }
-                if (wasPacketAdded) {
-                    sorted.clear();
-                    sorted.addAll(tmp);
-                } else {
-                    sorted.add(packet);
+                if (!wasPacketAdded) {
+                    tmp.add(packet);
                 }
+                sorted.clear();
+                sorted.addAll(tmp);
             }
-
         }
         return sorted;
     }
