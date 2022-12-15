@@ -29,8 +29,10 @@ public class Main2022 {
 //                new Dec9(Utils.getFilePath(inputsDir, "dec_9.txt")),
 //                new Dec10(Utils.getFilePath(inputsDir, "dec_10.txt")),
 //                new Dec11(Utils.getFilePath(inputsDir, "dec_11.txt")),
-                //new Dec12(Utils.getFilePath(inputsDir, "dec_12.txt"))
-                new Dec13(Utils.getFilePath(inputsDir, "dec_13.txt"))
+//                new Dec12(Utils.getFilePath(inputsDir, "dec_12.txt")),
+//                new Dec13(Utils.getFilePath(inputsDir, "dec_13.txt")),
+                new Dec14(Utils.getFilePath(inputsDir, "dec_14.txt"))
+
         );
 
         DecBase.runTasks(adventTasks);
