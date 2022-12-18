@@ -31,7 +31,8 @@ public class Main2022 {
 //                new Dec11(Utils.getFilePath(inputsDir, "dec_11.txt")),
 //                new Dec12(Utils.getFilePath(inputsDir, "dec_12.txt")),
 //                new Dec13(Utils.getFilePath(inputsDir, "dec_13.txt")),
-                new Dec14(Utils.getFilePath(inputsDir, "dec_14.txt"))
+//                new Dec14(Utils.getFilePath(inputsDir, "dec_14.txt")),
+                new Dec15(Utils.getFilePath(inputsDir, "dec_15.txt"))
 
         );
 
