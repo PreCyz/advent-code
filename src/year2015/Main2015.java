@@ -11,7 +11,7 @@ public class Main2015 {
 
     public static void main(String[] args) {
         Path inputsDir = Paths.get("", "inputs", "2015");
-        if (args != null) {
+        if (args.length > 0) {
             inputsDir = Paths.get("", args);
         }
 

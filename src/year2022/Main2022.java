@@ -12,7 +12,7 @@ public class Main2022 {
 
     public static void main(String[] args) {
         Path inputsDir = Paths.get("", "inputs", "2022");
-        if (args.length == 0) {
+        if (args.length > 0) {
             System.out.printf("Args taken from the launch arguments: %s%n", Arrays.asList(args));
             inputsDir = Paths.get("", args);
         }
