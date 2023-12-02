@@ -4,7 +4,6 @@ import base.DecBase;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -18,7 +17,15 @@ class Dec1 extends DecBase {
     @Override
     public Dec1 readDefaultInput() {
         System.out.println("Reading default input.");
-        inputStrings = new LinkedList<>(Stream.of("eighteight9dnvcqznjvfpreight").toList());
+        inputStrings = new LinkedList<>(Stream.of(
+                "two1nine",
+                "eightwothree",
+                "abcone2threexyz",
+                "xtwone3four",
+                "4nineeightseven2",
+                "zoneight234",
+                "7pqrstsixteen"
+        ).toList());
         return this;
     }
 
@@ -44,16 +51,24 @@ class Dec1 extends DecBase {
             }
         }
 
-        System.out.printf("Sum %d%n", sums.stream().mapToInt(Long::intValue).sum());
+        System.out.printf("Part 1 - Sum %d%n", sums.stream().mapToInt(Long::intValue).sum());
     }
 
-    private final Map<String, Integer> numbers = Map.of("one", 1, "two", 2, "three", 3, "four", 4, "five", 5, "six", 6, "seven", 7, "eight", 8, "nine", 9);
+    private static final Map<String, Integer> numbers = Map.of("one", 1, "two", 2, "three", 3, "four", 4, "five", 5, "six", 6, "seven", 7, "eight", 8, "nine", 9);
 
     private static class Pair {
-        String number;
+        Integer number;
+        String numberTxt;
         Integer index;
 
-        public Pair(String number, Integer index) {
+        public Pair(final String numberTxt, final Integer index) {
+            this.numberTxt = numberTxt;
+            this.number = numbers.get(numberTxt);
+            this.index = index;
+        }
+
+        public Pair(final Integer number, final Integer index) {
+            this.numberTxt = numbers.entrySet().stream().filter(e -> e.getValue().equals(number)).findFirst().map(Map.Entry::getKey).orElseThrow();
             this.number = number;
             this.index = index;
         }
@@ -65,21 +80,12 @@ class Dec1 extends DecBase {
 
         for (String value : inputStrings) {
 
-            Pair minPair = new Pair(null, Integer.MAX_VALUE);
-            Pair maxPair = new Pair(null, Integer.MIN_VALUE);
+            Pair minPair = new Pair("zero", Integer.MAX_VALUE);
+            Pair maxPair = new Pair("zero", Integer.MIN_VALUE);
 
-            List<Pair> pairs = new ArrayList<>();
             for (String number : numbers.keySet()) {
                 int idx = value.indexOf(number);
 
-                if (idx >= 0 && value.split(number).length > 0) {
-                    String[] split = value.split(number);
-                }
-
-
-                if (idx >= 0) {
-                    pairs.add(new Pair(number, idx));
-                }
                 if (idx >= 0) {
                     if (idx < minPair.index) {
                         minPair = new Pair(number, idx);
@@ -87,67 +93,41 @@ class Dec1 extends DecBase {
                     if (idx > maxPair.index) {
                         maxPair = new Pair(number, idx);
                     }
+
+                    String tmp = value.replaceFirst(number, "");
+                    int replacementCounter = 1;
+                    while (tmp.contains(number)) {
+                        int actualIdx = tmp.indexOf(number) + replacementCounter * number.length();
+                        if (actualIdx < minPair.index) {
+                            minPair = new Pair(number, actualIdx);
+                        }
+                        if (actualIdx > maxPair.index) {
+                            maxPair = new Pair(number, actualIdx);
+                        }
+                        tmp = tmp.replaceFirst(number, "");
+                        replacementCounter++;
+                    }
                 }
             }
 
-
-            final Pair min = new Pair(minPair.number, minPair.index);
-            final Pair max = new Pair(maxPair.number, maxPair.index);
-
-            String digit1 = null, digit2 = null;
             for (int i = 0; i < value.length(); i++) {
                 char c1 = value.charAt(i);
                 char c2 = value.charAt(value.length() - i - 1);
-                if (digit1 == null && Character.isDigit(c1)) {
+                if (Character.isDigit(c1)) {
                     if (i < minPair.index) {
-                        digit1 = String.valueOf(c1);
-                    } else {
-                        digit1 = String.valueOf(numbers.get(
-                                pairs.stream()
-                                        .filter(p -> p.index.equals(min.index))
-                                        .findFirst()
-                                        .map(p -> p.number)
-                                        .orElseThrow()
-                        ));
+                        minPair = new Pair(Integer.parseInt(String.valueOf(c1)), i);
                     }
                 }
-                if (digit2 == null && Character.isDigit(c2)) {
-                    if (value.length() - i - 1 > max.index) {
-                        digit2 = String.valueOf(c2);
-                    } else {
-                        digit2 = String.valueOf(numbers.get(
-                                pairs.stream()
-                                        .filter(p -> p.index.equals(max.index))
-                                        .findFirst()
-                                        .map(p -> p.number)
-                                        .orElseThrow()
-                        ));
+                if (Character.isDigit(c2)) {
+                    if (value.length() - i - 1 > maxPair.index) {
+                        maxPair = new Pair(Integer.parseInt(String.valueOf(c2)), value.length() - i - 1);
                     }
                 }
-                if (digit1 != null && digit2 != null) {
-                    sums.add(Long.parseLong(digit1 + digit2));
-                    break;
-                }
             }
-            if (digit1 == null && digit2 == null) {
-                digit1 = String.valueOf(numbers.get(
-                        pairs.stream()
-                                .filter(p -> p.index.equals(min.index))
-                                .findFirst()
-                                .map(p -> p.number)
-                                .orElseThrow()
-                ));
-                digit2 = String.valueOf(numbers.get(
-                        pairs.stream()
-                                .filter(p -> p.index.equals(max.index))
-                                .findFirst()
-                                .map(p -> p.number)
-                                .orElseThrow()
-                ));
-                sums.add(Long.parseLong(digit1 + digit2));
-            }
+
+            sums.add(Long.valueOf(minPair.number + "" + maxPair.number));
         }
 
-        System.out.printf("Top sum %d%n", sums.stream().mapToInt(Long::intValue).sum());
+        System.out.printf("Part 2 - Sum %d%n", sums.stream().mapToInt(Long::intValue).sum());
     }
 }
