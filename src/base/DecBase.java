@@ -2,7 +2,9 @@ package base;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();
@@ -22,7 +24,7 @@ public abstract class DecBase implements Runnable {
         try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
-                if (nextLine != null && !"".equals(nextLine)) {
+                if (nextLine != null && !nextLine.isEmpty()) {
                     inputStrings.add(nextLine);
                 }
             }
