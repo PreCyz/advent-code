@@ -39,7 +39,7 @@ public abstract class DecBase implements Runnable {
     @Override
     public void run() {
         System.out.printf("Calculating ... %s%n", this.getClass().getSimpleName());
-        //calculatePart1();
+        calculatePart1();
         calculatePart2();
     }
 
