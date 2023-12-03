@@ -46,7 +46,30 @@ class Dec3 extends DecBase {
 
     @Override
     protected void calculatePart1() {
-        long sum = 0;
+        final char[][] array = getArray();
+
+        ArrayList<Point> points = new ArrayList<>(1000);
+        for (int y = 0; y < array.length; y++) {
+            for (int x = 0; x < array[0].length; x++) {
+                char ch = array[x][y];
+                if (!Character.isDigit(ch) && ch != '.') {
+                    points.add(new Point(x, y, ch));
+                }
+            }
+        }
+        points.trimToSize();
+
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (Point point : points) {
+            HashSet<Integer> numberSet = numbersAroundCharacterSet(array, point);
+            numbers.addAll(numberSet);
+        }
+
+        long sum = numbers.stream().mapToInt(it -> it).sum();
+        System.out.printf("Part 1 - Total score %d%n", sum);
+    }
+
+    private char[][] getArray() {
         final char[][] array = new char[inputStrings.getFirst().length()][inputStrings.size()];
 
         int y = 0;
@@ -57,49 +80,36 @@ class Dec3 extends DecBase {
             }
             y++;
         }
+        return array;
+    }
 
-        ArrayList<Point> points = new ArrayList<>(1000);
-
-        for (y = 0; y < array.length; y++) {
-            for (int x = 0; x < array[0].length; x++) {
-                char ch = array[x][y];
-                if (!Character.isDigit(ch) && ch != '.') {
-                    points.add(new Point(x, y, ch));
-                }
-            }
+    private HashSet<Integer> numbersAroundCharacterSet(char[][] array, Point point) {
+        HashSet<Integer> numbersAroundCharacter = new HashSet<>();
+        if (isNumber(array, point.x + 1, point.y)) {
+            numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y));
         }
-
-        ArrayList<Integer> numbers = new ArrayList<>();
-        for (Point point : points) {
-            HashSet<Integer> numbersAroundCharacter = new HashSet<>();
-            if (isNumber(array, point.x + 1, point.y)) {
-                numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y));
-            }
-            if (isNumber(array, point.x - 1, point.y)) {
-                numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y));
-            }
-            if (isNumber(array, point.x, point.y + 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x, point.y + 1));
-            }
-            if (isNumber(array, point.x, point.y - 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x, point.y - 1));
-            }
-            if (isNumber(array, point.x - 1, point.y - 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y - 1));
-            }
-            if (isNumber(array, point.x + 1, point.y - 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y - 1));
-            }
-            if (isNumber(array, point.x + 1, point.y + 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y + 1));
-            }
-            if (isNumber(array, point.x - 1, point.y + 1)) {
-                numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y + 1));
-            }
-            numbers.addAll(numbersAroundCharacter);
+        if (isNumber(array, point.x - 1, point.y)) {
+            numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y));
         }
-
-        System.out.printf("Part 1 - Total score %d%n", numbers.stream().mapToInt(it -> it).sum());
+        if (isNumber(array, point.x, point.y + 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x, point.y + 1));
+        }
+        if (isNumber(array, point.x, point.y - 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x, point.y - 1));
+        }
+        if (isNumber(array, point.x - 1, point.y - 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y - 1));
+        }
+        if (isNumber(array, point.x + 1, point.y - 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y - 1));
+        }
+        if (isNumber(array, point.x + 1, point.y + 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x + 1, point.y + 1));
+        }
+        if (isNumber(array, point.x - 1, point.y + 1)) {
+            numbersAroundCharacter.add(findNumber(array, point.x - 1, point.y + 1));
+        }
+        return numbersAroundCharacter;
     }
 
     boolean isNumber(char[][] array, int x, int y) {
@@ -143,8 +153,32 @@ class Dec3 extends DecBase {
 
     @Override
     protected void calculatePart2() {
-        int sum = 0;
+        final char[][] array = getArray();
 
+        ArrayList<Point> points = new ArrayList<>(1000);
+        for (int y = 0; y < array.length; y++) {
+            for (int x = 0; x < array[0].length; x++) {
+                char ch = array[x][y];
+                if (!Character.isDigit(ch) && ch == '*') {
+                    points.add(new Point(x, y, ch));
+                }
+            }
+        }
+        points.trimToSize();
+
+        ArrayList<Integer> ratios = new ArrayList<>();
+        for (Point point : points) {
+            HashSet<Integer> numberSet = numbersAroundCharacterSet(array, point);
+            if (numberSet.size() == 2) {
+                Integer ratio = 1;
+                for (Integer number: numberSet) {
+                    ratio *= number;
+                }
+                ratios.add(ratio);
+            }
+        }
+
+        long sum = ratios.stream().mapToInt(it -> it).sum();
         System.out.printf("Part 2 - Total score %d%n", sum);
     }
 
