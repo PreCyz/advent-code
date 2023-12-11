@@ -11,6 +11,9 @@ import java.util.stream.Stream;
 
 class Dec10 extends DecBase {
 
+    final LinkedList<Point> loopPoints = new LinkedList<>();
+    char[][] maze;
+
     public Dec10(String fileName) {
         super(fileName);
     }
@@ -120,7 +123,8 @@ class Dec10 extends DecBase {
 
     @Override
     protected void calculatePart1() {
-        char[][] maze = new char[inputStrings.getFirst().length()][inputStrings.size()];
+        loopPoints.clear();
+        maze = new char[inputStrings.getFirst().length()][inputStrings.size()];
         int y = 0;
         for (String line : inputStrings) {
             maze[y++] = line.toCharArray();
@@ -131,12 +135,16 @@ class Dec10 extends DecBase {
 
         Point currentPosition = possibleNeighbours.get(0);
         Point previousPosition = start;
+
+        loopPoints.add(start);
+        loopPoints.add(currentPosition);
         long step = 0;
         do {
             step++;
             Point newCurrentPosition = getNextPosition(currentPosition, previousPosition, maze);
             previousPosition = currentPosition;
             currentPosition = newCurrentPosition;
+            loopPoints.add(newCurrentPosition);
 
         } while (currentPosition != null && currentPosition.shape != Shape.GROUND && !currentPosition.equals(start));
 
@@ -277,44 +285,111 @@ class Dec10 extends DecBase {
 
     @Override
     protected void calculatePart2() {
-        char[][] maze = new char[inputStrings.getFirst().length()][inputStrings.size()];
-        int y = 0;
-        for (String line : inputStrings) {
-            maze[y++] = line.toCharArray();
-        }
-
-        Point start = whereIsStart(maze);
-        ArrayList<Point> possibleNeighbours = determinePossibleNeighbours(start, maze);
-
-        Point currentPosition = possibleNeighbours.get(0);
-        Point previousPosition = start;
-        LinkedList<Point> loopPoints = new LinkedList<>();
-        loopPoints.add(start);
-        loopPoints.add(currentPosition);
-        do {
-            Point newCurrentPosition = getNextPosition(currentPosition, previousPosition, maze);
-            previousPosition = currentPosition;
-            currentPosition = newCurrentPosition;
-            loopPoints.add(newCurrentPosition);
-
-        } while (currentPosition != null && currentPosition.shape != Shape.GROUND && !currentPosition.equals(start));
-
-        char[][] cleared = new char[inputStrings.size()][inputStrings.getFirst().length()];
-        for (y = 0; y < inputStrings.size(); y++) {
+        char[][] onlyLoop = new char[inputStrings.size()][inputStrings.getFirst().length()];
+        char[][] finalGrid = new char[inputStrings.size()][inputStrings.getFirst().length()];
+        for (int y = 0; y < inputStrings.size(); y++) {
             for (int x = 0; x < inputStrings.getFirst().length(); x++) {
-                cleared[y][x] = '.';
+                onlyLoop[y][x] = '.';
             }
         }
         System.out.println("##########################################");
         for (Point point : loopPoints) {
-            cleared[point.y][point.x] = '*';
+            onlyLoop[point.y][point.x] = point.value;
         }
 
-        System.out.println();
-        Utils.printGrid2(cleared);
+        System.out.println("##########################################\n");
+        Utils.printGrid2(onlyLoop);
+        System.out.println("##########################################\n");
 
         long sum = 0;
+        for (int y = 0; y < onlyLoop.length; y++) {
+            for (int x = 0; x < onlyLoop[y].length; x++) {
+                finalGrid[y][x] = onlyLoop[y][x];
+                if (onlyLoop[y][x] == '.') {
+                    boolean isInside = isInside(x, y, onlyLoop);
+                    sum += isInside ? 1 : 0;
+                    if (isInside) {
+                        finalGrid[y][x] = 'I';
+                    } else {
+                        finalGrid[y][x] = 'O';
+                    }
+                }
+            }
+        }
+
+        System.out.println("##########################################\n");
+        Utils.printGrid2(finalGrid);
+        System.out.println("##########################################\n");
+
         System.out.printf("Part 2 - Total score %d%n", sum);
+    }
+
+    private boolean isInside(int x, int y, char[][] grid) {
+        boolean result = verticalCheck(x, y, grid);
+        result &= horizontalCheck(x, y, grid);
+        return result;
+    }
+
+    boolean verticalCheck(int x, int y, char[][] grid) {
+        //even
+        if (x == 0 || y == 0) {
+            return false;
+        }
+        //bottom
+        int bottomCounter = 0;
+        for (int yy = y + 1; yy < grid.length; yy++) {
+            if (grid[yy][x] == '-') {
+                bottomCounter++;
+            }
+        }
+        if (bottomCounter == 0) {
+            return false;
+        }
+            //top
+        int topCounter = 0;
+        for (int yy = y - 1; yy >= 0; yy--) {
+            if (grid[yy][x] == '-') {
+                topCounter++;
+            } else if (grid[yy][x] == 'F' && (grid[yy][x+1] == '7' || grid[yy][x+1] == 'J' || grid[yy][x+1] == '-')) {
+                topCounter++;
+            } else if (grid[yy][x] == 'L' && (grid[yy][x+1] == 'J' || grid[yy][x+1] == '7' || grid[yy][x+1] == '-')) {
+                topCounter++;
+            }
+        }
+        if (topCounter == 0) {
+            return false;
+        }
+
+        return bottomCounter % 2 == 1 && topCounter % 2 == 1;
+    }
+
+    boolean horizontalCheck(int x, int y, char[][] grid) {
+        //odd
+        if (x == 0 || y == 0) {
+            return false;
+        }
+        //right
+        int rightCounter = 0;
+        for (int xx = x + 1; xx < grid[y].length; xx++) {
+            if (grid[y][xx] == '|') {
+                rightCounter++;
+            }
+        }
+        if (rightCounter == 0) {
+            return false;
+        }
+        //left
+        int leftCounter = 0;
+        for (int xx = x - 1; xx >= 0; xx--) {
+            if (grid[y][xx] == '|') {
+                leftCounter++;
+            }
+        }
+        if (leftCounter == 0) {
+            return false;
+        }
+
+        return leftCounter % 2 == 1 && rightCounter % 2 == 1;
     }
 
 }
