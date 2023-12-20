@@ -26,7 +26,7 @@ public abstract class DecBase implements Runnable {
         try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
-                if (nextLine != null /*&& !nextLine.isEmpty()*/) {
+                if (nextLine != null && !nextLine.isEmpty()) {
                     inputStrings.add(nextLine);
                 }
             }
