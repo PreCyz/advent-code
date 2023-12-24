@@ -2,6 +2,9 @@ package utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public final class Utils {
 
@@ -96,6 +99,19 @@ public final class Utils {
             }
             System.out.println();
         }
+    }
+
+    public static ArrayList<String> transpose(List<String> strings) {
+        int colIdx = 0;
+        ArrayList<String> newStrings = new ArrayList<>(Stream.generate(() -> "").limit(strings.get(0).length()).toList());
+
+        while (colIdx < strings.get(0).length()) {
+            for (String line : strings) {
+                newStrings.set(colIdx, newStrings.get(colIdx) + line.charAt(colIdx));
+            }
+            colIdx++;
+        }
+        return newStrings;
     }
 
 }
