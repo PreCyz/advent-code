@@ -92,7 +92,7 @@ public final class Utils {
         }
     }
 
-    public static void printGrid2(char[][] grid) {
+    public static void printGridYFirst(char[][] grid) {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
                 System.out.print(grid[y][x]);

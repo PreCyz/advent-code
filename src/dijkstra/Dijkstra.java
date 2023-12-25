@@ -1,6 +1,10 @@
 package dijkstra;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Dijkstra {
 
@@ -66,7 +70,7 @@ public class Dijkstra {
         int edgeDist = -1;
         int newDist = -1;
 
-        // All of the neighbors of vx
+        // All neighbors of vx
         for (int j = 0; j < adjacent.get(ux).size(); j++) {
             Node vx = adjacent.get(ux).get(j);
 
