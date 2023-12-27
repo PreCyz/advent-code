@@ -1,10 +1,6 @@
 package dijkstra;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 public class Dijkstra {
 
@@ -19,14 +15,13 @@ public class Dijkstra {
 
     // Constructor of the class
     public Dijkstra(int totalNodes) {
-
         this.totalNodes = totalNodes;
         distance = new int[totalNodes];
         settled = new HashSet<>();
         pQue = new PriorityQueue<>(totalNodes, new Node());
     }
 
-    public void dijkstra(List<List<Node>> adjacent, int s) {
+    public void dijkstra(List<List<Node>> adjacent, int startNodeNumber) {
         this.adjacent = adjacent;
 
         for (int j = 0; j < totalNodes; j++) {
@@ -35,10 +30,10 @@ public class Dijkstra {
         }
 
         // Adding the source node to pQue
-        pQue.add(new Node(s, 0));
+        pQue.add(new Node(startNodeNumber, 0));
 
         // distance of the source is always zero
-        distance[s] = 0;
+        distance[startNodeNumber] = 0;
 
         while (settled.size() != totalNodes) {
 
@@ -49,7 +44,7 @@ public class Dijkstra {
             }
 
             // Deleting the node that has the minimum distance from the priority queue
-            int ux = pQue.remove().n;
+            int ux = pQue.remove().number;
 
             // Adding the node whose distance is
             // confirmed
@@ -75,26 +70,30 @@ public class Dijkstra {
             Node vx = adjacent.get(ux).get(j);
 
             // If the current node hasn't been already processed
-            if (!settled.contains(vx.n)) {
+            if (!settled.contains(vx.number)) {
                 edgeDist = vx.price;
                 newDist = distance[ux] + edgeDist;
 
                 // If the new distance is lesser in the cost
-                if (newDist < distance[vx.n]) {
-                    distance[vx.n] = newDist;
+                if (newDist < distance[vx.number]) {
+                    distance[vx.number] = newDist;
                 }
 
                 // Adding the current node to the priority queue pQue
-                pQue.add(new Node(vx.n, distance[vx.n]));
+                pQue.add(new Node(vx.number, distance[vx.number]));
             }
         }
     }
 
-    // Main method
-    public static void main(String[] argvs) {
+    public void print(int startNodeNumber) {
+        for (int j = 0; j < distance.length; j++) {
+            System.out.printf("%d to %d is %d%n", startNodeNumber, j, distance[j]);
+        }
+    }
 
-        int totalNodes = 10;
-        int s = 1;
+    // Main method
+    public static void main(String[] args) {
+
 
         // representation of the connected edges
         // using the adjacency list
@@ -103,6 +102,7 @@ public class Dijkstra {
         // Declaring and object of the type List<Node>
         List<List<Node>> adjacent = new ArrayList<>();
 
+        int totalNodes = 10;
         // Initialize list for every node
         for (int i = 0; i < totalNodes; i++) {
             List<Node> itm = new ArrayList<>();
@@ -139,16 +139,21 @@ public class Dijkstra {
         adjacent.get(8).add(new Node(9, 21, "JJ"));
         adjacent.get(9).add(new Node(8, 0, "II"));
 
-        // creating an object of the class DijkstraExample1
+        int sourceNode = 1;
+
         Dijkstra obj = new Dijkstra(totalNodes);
-        obj.dijkstra(adjacent, s);
+        obj.dijkstra(adjacent, sourceNode);
 
         // Printing the shortest path to all the nodes
         // from the source node
         System.out.println("The shortest path from the node :");
 
         for (int j = 0; j < obj.distance.length; j++) {
-            System.out.println(s + " to " + j + " is " + obj.distance[j]);
+            System.out.printf("%d to %d is %d%n", sourceNode, j, obj.distance[j]);
         }
+    }
+
+    public int getDistance(int destinationNodeNumber) {
+        return distance[destinationNodeNumber];
     }
 }

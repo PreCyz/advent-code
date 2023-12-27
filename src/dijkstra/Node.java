@@ -5,9 +5,9 @@ import java.util.Comparator;
 /** The Node class implementing the Comparator interface
  *  The object of this class represents a node of the graph
 */
-class Node implements Comparator<Node> {
+public class Node implements Comparator<Node> {
 
-    public int n;
+    public int number;
     public int price;
     public String name;
 
@@ -17,12 +17,12 @@ class Node implements Comparator<Node> {
     public Node() {}
 
     // Constructor 2
-    public Node(int n, int price) {
-        this(n, price, "");
+    public Node(int number, int price) {
+        this(number, price, "");
     }
 
-    public Node(int n, int price, String name) {
-        this.n = n;
+    public Node(int number, int price, String name) {
+        this.number = number;
         this.price = price;
         this.name = name;
     }
