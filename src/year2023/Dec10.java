@@ -3,9 +3,7 @@ package year2023;
 import base.DecBase;
 import utils.Utils;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -298,7 +296,7 @@ class Dec10 extends DecBase {
         }
 
         System.out.println("##########################################\n");
-        Utils.printGrid2(onlyLoop);
+        Utils.printGridYFirst(onlyLoop);
         System.out.println("##########################################\n");
 
         long sum = 0;
@@ -318,7 +316,7 @@ class Dec10 extends DecBase {
         }
 
         System.out.println("##########################################\n");
-        Utils.printGrid2(finalGrid);
+        Utils.printGridYFirst(finalGrid);
         System.out.println("##########################################\n");
 
         System.out.printf("Part 2 - Total score %d%n", sum);

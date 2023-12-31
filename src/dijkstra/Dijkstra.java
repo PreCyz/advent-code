@@ -91,68 +91,6 @@ public class Dijkstra {
         }
     }
 
-    // Main method
-    public static void main(String[] args) {
-
-
-        // representation of the connected edges
-        // using the adjacency list
-        // by declaration of the List class object
-
-        // Declaring and object of the type List<Node>
-        List<List<Node>> adjacent = new ArrayList<>();
-
-        int totalNodes = 10;
-        // Initialize list for every node
-        for (int i = 0; i < totalNodes; i++) {
-            List<Node> itm = new ArrayList<>();
-            adjacent.add(itm);
-        }
-
-        // adding the edges
-        // The statement adjacent.get(0).add(new Node(1, 3)); means
-        // to travel from node 0 to 1, one has to cover 3 units of distance
-        // it does not mean one has to travel from 1 to 0
-        // To travel from 1 to 0, we have to add the statement
-        // adjacent.get(1).add(new Node(0, 3));
-        // Note that the distance is the same i.e., 3 units in both the cases.
-        // Similarly, we have added other edges too.
-
-        adjacent.get(0).add(new Node(3, 13, "DD"));
-        adjacent.get(0).add(new Node(8, 0, "II"));
-        adjacent.get(0).add(new Node(1, 13, "BB"));
-        adjacent.get(1).add(new Node(2, 2, "CC"));
-        adjacent.get(1).add(new Node(0, 0, "AA"));
-        adjacent.get(2).add(new Node(3, 20, "DD"));
-        adjacent.get(2).add(new Node(1, 13, "BB"));
-        adjacent.get(3).add(new Node(2, 2, "CC"));
-        adjacent.get(3).add(new Node(0, 0, "AA"));
-        adjacent.get(3).add(new Node(4, 3, "EE"));
-        adjacent.get(4).add(new Node(5, 0, "FF"));
-        adjacent.get(4).add(new Node(4, 20, "DD"));
-        adjacent.get(5).add(new Node(4, 3, "EE"));
-        adjacent.get(5).add(new Node(6, 0, "GG"));
-        adjacent.get(6).add(new Node(5, 0, "FF"));
-        adjacent.get(6).add(new Node(7, 22, "HH"));
-        adjacent.get(7).add(new Node(6, 0, "GG"));
-        adjacent.get(8).add(new Node(0, 0, "AA"));
-        adjacent.get(8).add(new Node(9, 21, "JJ"));
-        adjacent.get(9).add(new Node(8, 0, "II"));
-
-        int sourceNode = 1;
-
-        Dijkstra obj = new Dijkstra(totalNodes);
-        obj.dijkstra(adjacent, sourceNode);
-
-        // Printing the shortest path to all the nodes
-        // from the source node
-        System.out.println("The shortest path from the node :");
-
-        for (int j = 0; j < obj.distance.length; j++) {
-            System.out.printf("%d to %d is %d%n", sourceNode, j, obj.distance[j]);
-        }
-    }
-
     public int getDistance(int destinationNodeNumber) {
         return distance[destinationNodeNumber];
     }

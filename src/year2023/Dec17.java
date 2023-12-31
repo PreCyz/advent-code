@@ -5,22 +5,22 @@ import base.DecBase;
 import java.util.*;
 import java.util.stream.Stream;
 
-class Dec17 extends DecBase {
+public class Dec17 extends DecBase {
 
     public Dec17(String fileName) {
         super(fileName);
     }
 
-    private enum Direction {START, NORTH, SOUTH, WEST, EAST}
+    public enum Direction {START, NORTH, SOUTH, WEST, EAST}
 
-    private static class CityBlock implements Comparable<CityBlock> {
-        int number;
-        int heatLoss;
-        int x;
-        int y;
-        final LinkedList<Route> route;
+    public static class CityBlock implements Comparable<CityBlock> {
+        public int number;
+        public int heatLoss;
+        public int x;
+        public int y;
+        public final LinkedList<Route> route;
 
-        CityBlock(int number, int heatLoss, int x, int y) {
+        public CityBlock(int number, int heatLoss, int x, int y) {
             this.number = number;
             this.heatLoss = heatLoss;
             this.x = x;
@@ -36,7 +36,7 @@ class Dec17 extends DecBase {
             this.route = new LinkedList<>(steps);
         }
 
-        CityBlock(CityBlock cityBlock, int heatLoss) {
+        public CityBlock(CityBlock cityBlock, int heatLoss) {
             this(cityBlock, cityBlock.route);
             this.heatLoss = heatLoss;
         }
@@ -61,7 +61,7 @@ class Dec17 extends DecBase {
         }
     }
 
-    private static class Route {
+    public static class Route {
         Direction direction;
         int heatLoss;
 
@@ -126,16 +126,16 @@ class Dec17 extends DecBase {
         System.out.printf("Part 1 - directions to %d: %s%n", destinationNodeNumber, dijkstra.directionsMap.get(destinationNodeNumber));
     }
 
-    private static class Dijkstra {
+    public static class Dijkstra {
 
-        final int[] heatLosses;
-        final int numberOfLastSteps;
-        final Set<Integer> visited;
+        public final int[] heatLosses;
+        protected final int numberOfLastSteps;
+        protected final Set<Integer> visited;
         final PriorityQueue<CityBlock> pQue;
-        final int totalNodes;
-        final CityBlock[][] cityBlocks;
+        protected final int totalNodes;
+        protected final CityBlock[][] cityBlocks;
 
-        final Map<Integer, LinkedList<Route>> directionsMap;
+        public final Map<Integer, LinkedList<Route>> directionsMap;
 
         public Dijkstra(int totalNodes, CityBlock[][] cityBlocks, int numberOfLastSteps) {
             this.cityBlocks = cityBlocks;
@@ -195,7 +195,7 @@ class Dec17 extends DecBase {
             }
         }
 
-        private ArrayList<CityBlock> findNeighbors(CityBlock cityBlock) {
+        protected ArrayList<CityBlock> findNeighbors(CityBlock cityBlock) {
             List<Route> steps = cityBlock.route;
 
             Direction lastStep = Direction.START;

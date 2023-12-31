@@ -3,9 +3,7 @@ package year2023;
 import base.DecBase;
 import utils.Utils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec14 extends DecBase {
@@ -98,7 +96,7 @@ class Dec14 extends DecBase {
         ArrayList<Long> sums = new ArrayList<>(numberOfCycles);
         LinkedList<Long> sumCycle = new LinkedList<>();
         int duplicateCounter = 0;
-
+/*
         for (int cycle = 1; cycle <= numberOfCycles; ++cycle) {
             output = Utils.transpose(tiltNorth(Utils.transpose(output)));
             output = tiltWest(output);
@@ -120,11 +118,11 @@ class Dec14 extends DecBase {
                 System.out.println("100 times in a row duplicate detected. Breaking the loop");
                 break;
             }
-        }
+        }*/
 
         int completeCycle = 38;
-        completeCycle = sumCycle.size();
-        int cycleStart = 140;
+        //completeCycle = sumCycle.size();
+        int cycleStart = 102;
 
         long number = (numberOfCycles - cycleStart) % completeCycle;
         //long sum = getSum(output);
