@@ -35,14 +35,34 @@ public class Dec18 extends DecBase {
                 }
             }
         }
+
+        static Direction valueOfNumber(char c) {
+            switch (c) {
+                case '3' -> {
+                    return UP;
+                }
+                case '1' -> {
+                    return DOWN;
+                }
+                case '2' -> {
+                    return LEFT;
+                }
+                case '0' -> {
+                    return RIGHT;
+                }
+                default -> {
+                    return START;
+                }
+            }
+        }
     }
 
     private static class Trench {
         Direction direction;
-        int meters;
+        long meters;
         String hexadecimalRGB;
 
-        public Trench(Direction direction, int meters, String hexadecimalRGB) {
+        public Trench(Direction direction, long meters, String hexadecimalRGB) {
             this.direction = direction;
             this.meters = meters;
             this.hexadecimalRGB = hexadecimalRGB;
@@ -82,6 +102,61 @@ public class Dec18 extends DecBase {
 
     @Override
     protected void calculatePart1() {
+        //brutalForceApproach();
+
+        Point startPoint = new Point(0, 0);
+        ArrayList<Point> points = new ArrayList<>(inputStrings.size() + 1);
+        points.add(startPoint);
+
+        int boundaryPoints = 0;
+        for (String line : inputStrings) {
+            String[] split = line.split(" ");
+            Direction dir = Direction.valueOf(split[0].charAt(0));
+            int distance = Integer.parseInt(split[1]);
+
+            Point newPoint = createPoint(dir, startPoint, distance);
+            points.add(newPoint);
+            startPoint = newPoint;
+            boundaryPoints += distance;
+        }
+
+        long sum = getSum(points, boundaryPoints);
+
+        System.out.printf("Part 1 - Total score %d%n", sum);
+    }
+
+    private Point createPoint(Direction dir, Point startPoint, int distance) {
+        Point newPoint = null;
+        switch (dir) {
+            case UP -> newPoint = new Point(startPoint.x, startPoint.y - distance);
+            case DOWN -> newPoint = new Point(startPoint.x, startPoint.y + distance);
+            case RIGHT -> newPoint = new Point(startPoint.x + distance, startPoint.y);
+            case LEFT -> newPoint = new Point(startPoint.x - distance, startPoint.y);
+        }
+        return newPoint;
+    }
+
+    private static long getSum(ArrayList<Point> points, int boundaryPoints) {
+        long A = 0;
+        for (int i = 0; i < points.size(); i++) {
+            Point pi = points.get(i);
+            Point pi1 = pi;
+            if (i - 1 >= 0) {
+                pi1 = points.get(i - 1);
+            }
+            Point pi2 = pi;
+            if (i + 1 < points.size()) {
+                pi2 = points.get(i + 1);
+            }
+            A += pi.x * (pi2.y - pi1.y);
+        }
+        A = Math.abs(A) / 2;
+
+        long internalPoints = A - boundaryPoints /2 + 1;
+        return internalPoints + boundaryPoints;
+    }
+
+    private void brutalForceApproach() {
         ArrayList<Trench> trenches = new ArrayList<>(inputStrings.stream().map(Trench::valueOf).toList());
 
         int maxXR = maxXR(trenches);
@@ -297,9 +372,53 @@ public class Dec18 extends DecBase {
         return counter;
     }
 
+    /** Solution is based on these 2 articles
+     *  <a href="https://en.wikipedia.org/wiki/Shoelace_formula">Shoelace formula</a>
+     *  <a href="https://en.wikipedia.org/wiki/Pick%27s_theorem">Pick's theorem</a>
+     */
     @Override
     protected void calculatePart2() {
-        long sum = 0;
+        Point startPoint = new Point(0, 0);
+
+        ArrayList<Point> points = new ArrayList<>(inputStrings.size() + 1);
+        points.add(startPoint);
+
+        int boundryPoints = 0;
+        for (String line : inputStrings) {
+            String[] split = line.split(" ");
+            String color = split[2].replace(")", "")
+                    .replace("(", "")
+                    .replace("#", "");
+            Direction dir = Direction.valueOfNumber(color.charAt(color.length() - 1));
+            int distance = Long.decode( "0x" + color.substring(0, color.length() - 1)).intValue();
+
+            Point newPoint = createPoint(dir, startPoint, distance);
+            boundryPoints += distance;
+
+            points.add(newPoint);
+            startPoint = newPoint;
+        }
+
+        long sum = getSum(points, boundryPoints);
+
         System.out.printf("Part 2 - Total score %d%n", sum);
+    }
+
+    static class Point {
+        long x;
+        long y;
+
+        Point(long x, long y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+            return "Point{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
     }
 }
