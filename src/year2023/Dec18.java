@@ -1,0 +1,305 @@
+package year2023;
+
+import base.DecBase;
+import utils.Utils;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.stream.Stream;
+
+public class Dec18 extends DecBase {
+
+    public Dec18(String fileName) {
+        super(fileName);
+    }
+
+    public enum Direction {
+        START, UP, DOWN, LEFT, RIGHT;
+
+        static Direction valueOf(char c) {
+            switch (c) {
+                case 'U' -> {
+                    return UP;
+                }
+                case 'D' -> {
+                    return DOWN;
+                }
+                case 'L' -> {
+                    return LEFT;
+                }
+                case 'R' -> {
+                    return RIGHT;
+                }
+                default -> {
+                    return START;
+                }
+            }
+        }
+    }
+
+    private static class Trench {
+        Direction direction;
+        int meters;
+        String hexadecimalRGB;
+
+        public Trench(Direction direction, int meters, String hexadecimalRGB) {
+            this.direction = direction;
+            this.meters = meters;
+            this.hexadecimalRGB = hexadecimalRGB;
+        }
+
+        static Trench valueOf(String line) {
+            String[] split = line.split(" ");
+            return new Trench(
+                    Direction.valueOf(split[0].charAt(0)),
+                    Integer.parseInt(split[1]),
+                    split[2].replace(")", "").replace("(", "")
+            );
+        }
+    }
+
+    @Override
+    public Dec18 readDefaultInput() {
+        System.out.println("Reading default input.");
+        inputStrings = new LinkedList<>(Stream.of(
+                "R 6 (#70c710)",
+                "D 5 (#0dc571)",
+                "L 2 (#5713f0)",
+                "D 2 (#d2c081)",
+                "R 2 (#59c680)",
+                "D 2 (#411b91)",
+                "L 5 (#8ceee2)",
+                "U 2 (#caa173)",
+                "L 1 (#1b58a2)",
+                "U 2 (#caa171)",
+                "R 2 (#7807d2)",
+                "U 3 (#a77fa3)",
+                "L 2 (#015232)",
+                "U 2 (#7a21e3)"
+        ).toList());
+        return this;
+    }
+
+    @Override
+    protected void calculatePart1() {
+        ArrayList<Trench> trenches = new ArrayList<>(inputStrings.stream().map(Trench::valueOf).toList());
+
+        int maxXR = maxXR(trenches);
+        int maxXL = maxXL(trenches);
+        int maxYU = maxYU(trenches);
+        int maxYD = maxYD(trenches);
+
+        Trench[][] dugOutGrid = createDugOutGrid(maxYD, maxYU, maxXR, maxXL, trenches);
+
+        final char[][] grid = buildGrid(dugOutGrid);
+        Utils.writeToFile(grid);
+
+        final char[][] finalDugout = createLavaDugout(grid);
+        Utils.writeToFile(finalDugout);
+
+        long sum = countTrench(finalDugout);
+        System.out.printf("Part 1 - Total score %d%n", sum);
+    }
+
+    private int maxXR(ArrayList<Trench> trenches) {
+        int max = 0;
+        int sum = 0;
+        for (Trench trench : trenches) {
+            if (trench.direction == Direction.LEFT) {
+                sum -= trench.meters;
+            } else if (trench.direction == Direction.RIGHT) {
+                sum += trench.meters;
+            }
+            if (max < sum) {
+                max = sum;
+            }
+        }
+        return max;
+    }
+
+    private int maxXL(ArrayList<Trench> trenches) {
+        int max = 0;
+        int sum = 0;
+        for (Trench trench : trenches) {
+            if (trench.direction == Direction.LEFT) {
+                sum += trench.meters;
+            } else if (trench.direction == Direction.RIGHT) {
+                sum -= trench.meters;
+            }
+            if (max < sum) {
+                max = sum;
+            }
+        }
+        return max;
+    }
+
+    private int maxYD(ArrayList<Trench> trenches) {
+        int max = 0;
+        int sum = 0;
+        for (Trench trench : trenches) {
+            if (trench.direction == Direction.UP) {
+                sum -= trench.meters;
+            } else if (trench.direction == Direction.DOWN) {
+                sum += trench.meters;
+            }
+            if (max < sum) {
+                max = sum;
+            }
+        }
+        return max;
+    }
+
+    private int maxYU(ArrayList<Trench> trenches) {
+        int max = 0;
+        int sum = 0;
+        for (Trench trench : trenches) {
+            if (trench.direction == Direction.UP) {
+                sum += trench.meters;
+            } else if (trench.direction == Direction.DOWN) {
+                sum -= trench.meters;
+            }
+            if (max < sum) {
+                max = sum;
+            }
+        }
+        return max;
+    }
+
+    private Trench[][] createDugOutGrid(int maxYD, int maxYU, int maxXR, int maxXL, ArrayList<Trench> trenches) {
+        int x = maxXL;
+        int y = maxYU;
+
+        Trench[][] dugOut = new Trench[maxYD + maxYU + 1][maxXR + maxXL + 1];
+        dugOut[y][x] = new Trench(Direction.START, 1, "");
+
+        for (Trench trench : trenches) {
+            switch (trench.direction) {
+                case RIGHT -> {
+                    for (int i = x + 1; i <= x + trench.meters; ++i) {
+                        dugOut[y][i] = new Trench(trench.direction, 1, trench.hexadecimalRGB);
+                    }
+                    x += trench.meters;
+                }
+                case LEFT -> {
+                    for (int i = x - 1; i >= x - trench.meters; --i) {
+                        dugOut[y][i] = new Trench(trench.direction, 1, trench.hexadecimalRGB);
+                    }
+                    x -= trench.meters;
+                }
+                case UP -> {
+                    for (int i = y - 1; i >= y - trench.meters; --i) {
+                        dugOut[i][x] = new Trench(trench.direction, 1, trench.hexadecimalRGB);
+                    }
+                    y -= trench.meters;
+                }
+                case DOWN -> {
+                    for (int i = y + 1; i <= y + trench.meters; ++i) {
+                        dugOut[i][x] = new Trench(trench.direction, 1, trench.hexadecimalRGB);
+                    }
+                    y += trench.meters;
+                }
+            }
+        }
+        return dugOut;
+    }
+
+    private char[][] buildGrid(Trench[][] digOut) {
+        char[][] grid = new char[digOut.length][digOut[0].length];
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[y].length; x++) {
+                if (digOut[y][x] != null) {
+                    grid[y][x] = '#';
+                } else {
+                    grid[y][x] = '.';
+                }
+            }
+        }
+        return grid;
+    }
+
+    private char[][] createLavaDugout(char[][] grid) {
+
+        final char[][] result = new char[grid.length][grid[0].length];
+
+        for (int y = 0; y < grid.length; y++) {
+
+            String row = String.valueOf(grid[y]);
+            if (row.contains(".") && row.contains("#")) {
+                boolean beginning = false;
+                int startIdx = -1;
+                int endIdx = -1;
+
+                for (int x = 0; x < grid[y].length; x++) {
+
+                    boolean isSeries = x + 1 < grid[y].length && grid[y][x] == '#' && grid[y][x + 1] == '#';
+                    if (isSeries) {
+
+                        int seriesStart = x;
+
+                        while (x < grid[y].length && grid[y][x] == '#') {
+                            result[y][x] = grid[y][x];
+                            x++;
+                        }
+
+                        boolean skipSeries = y + 1 < grid.length && grid[y + 1][seriesStart] == '#' && grid[y + 1][x - 1] == '#';
+                        skipSeries |= y - 1 >= 0 && grid[y - 1][seriesStart] == '#' && grid[y - 1][x - 1] == '#';
+                        if (!skipSeries) {
+                            if (beginning) {
+                                endIdx = x - 1;
+                            } else {
+                                beginning = true;
+                                startIdx = x - 1;
+                            }
+                        }
+                        x--;
+
+                    } else if (grid[y][x] == '#') {
+                        if (beginning) {
+                            endIdx = x;
+                        } else {
+                            beginning = true;
+                            startIdx = x;
+                        }
+                    } else {
+                        result[y][x] = grid[y][x];
+                    }
+
+                    if (beginning && endIdx > 0 && endIdx < grid[y].length) {
+                        for (int idx = startIdx; idx <= endIdx; idx++) {
+                            result[y][idx] = '#';
+                        }
+                    }
+
+                    if (startIdx >= 0 && endIdx >= 0 && endIdx - startIdx == 1) {
+                        startIdx = endIdx;
+                        endIdx = -1;
+                    } else if (startIdx >= 0 && endIdx >= 0 && endIdx - startIdx > 1) {
+                        beginning = false;
+                        startIdx = -1;
+                        endIdx = -1;
+                    }
+                }
+            } else {
+                result[y] = grid[y];
+            }
+        }
+
+        return result;
+    }
+
+    private long countTrench(char[][] grid) {
+        int counter = 0;
+        for (char[] chars : grid) {
+            for (char aChar : chars) {
+                counter += aChar == '#' ? 1 : 0;
+            }
+        }
+        return counter;
+    }
+
+    @Override
+    protected void calculatePart2() {
+        long sum = 0;
+        System.out.printf("Part 2 - Total score %d%n", sum);
+    }
+}

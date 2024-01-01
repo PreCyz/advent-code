@@ -1,7 +1,7 @@
 package utils;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -112,6 +112,28 @@ public final class Utils {
             colIdx++;
         }
         return newStrings;
+    }
+
+    public static void writeToFile(char[][] grid) {
+        String fileName = "output.txt";
+        try {
+            Files.deleteIfExists(Paths.get(".", fileName));
+        } catch (IOException e) {
+            System.err.println("UPS! " + e.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(fileName, true);
+             BufferedWriter bw = new BufferedWriter(fw)
+        ) {
+            for (char[] chars : grid) {
+                for (char aChar : chars) {
+                    bw.write(aChar);
+                }
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("UPS! " + e.getMessage());
+        }
     }
 
 }
