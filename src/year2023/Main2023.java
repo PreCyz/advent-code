@@ -21,12 +21,12 @@ public class Main2023 {
 //                new Dec11(Utils.getFilePath(inputsDir, "dec_11.txt")),
 //                new Dec12(Utils.getFilePath(inputsDir, "dec_12.txt")),
 //                new Dec13(Utils.getFilePath(inputsDir, "dec_13.txt")),
-//                new Dec14(Utils.getFilePath(inputsDir, "dec_14.txt")),
+                new Dec14(2023)
 //                new Dec15(Utils.getFilePath(inputsDir, "dec_15.txt")),
 //                new Dec16(Utils.getFilePath(inputsDir, "dec_16.txt")),
 //                new Dec17(Utils.getFilePath(inputsDir, "dec_17.txt")),
 //                new Dec18(Utils.getFilePath(inputsDir, "dec_18.txt")).
-                new Dec19(2023)
+//                new Dec19(2023)
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_20.txt"))
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_21.txt"))
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_22.txt"))

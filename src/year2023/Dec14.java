@@ -94,40 +94,74 @@ class Dec14 extends DecBase {
 
         ArrayList<String> output = new ArrayList<>(inputStrings);
         ArrayList<Long> sums = new ArrayList<>(numberOfCycles);
-        LinkedList<Long> sumCycle = new LinkedList<>();
-        int duplicateCounter = 0;
-/*
+
+        int[][] cycleDetails = new int[][]{};
+
         for (int cycle = 1; cycle <= numberOfCycles; ++cycle) {
             output = Utils.transpose(tiltNorth(Utils.transpose(output)));
             output = tiltWest(output);
             output = Utils.transpose(tiltSouth(Utils.transpose(output)));
             output = tiltEast(output);
-            long sum = getSum(Utils.transpose(output));
+            sums.add(getSum(Utils.transpose(output)));
 
-            if (sums.contains(sum)) {
-                duplicateCounter++;
-                sumCycle.add(sum);
-                System.out.printf("cycle %d - sum %d [duplicate]%n", cycle, sum);
-            } else {
-                duplicateCounter = 0;
-                sumCycle.clear();
-                //System.out.printf("cycle %d - sum %d%n", cycle, sum);
-            }
-            sums.add(sum);
-            if (duplicateCounter == 100) {
-                System.out.println("100 times in a row duplicate detected. Breaking the loop");
+            if (cycle % 500 == 0) {
+                cycleDetails = findCycle(sums);
                 break;
             }
-        }*/
+        }
 
-        int completeCycle = 38;
-        //completeCycle = sumCycle.size();
-        int cycleStart = 102;
-
-        long number = (numberOfCycles - cycleStart) % completeCycle;
-        //long sum = getSum(output);
+        int cycleStartIdx = cycleDetails[0][0];
+        int cycleLength = cycleDetails[0][1];
+        int number = (numberOfCycles - cycleStartIdx) % cycleLength;
+        long sum = sums.get(number + cycleStartIdx - 1);
         //right answer is 93102
-        System.out.printf("Part 2 - Total score %d%n", number);
+        System.out.printf("Part 2 - Total score %d%n", sum);
+    }
+
+    private int[][] findCycle(ArrayList<Long> sums) {
+        LinkedHashSet<Long> cycleSet = new LinkedHashSet<>();
+        Map<Long, ArrayList<Integer>> cycleMap = new HashMap<>();
+        int startIdx = -1;
+        for (int i = 0; i < sums.size(); i++) {
+            Long sum = sums.get(i);
+            if (cycleSet.contains(sum)) {
+                if (cycleMap.containsKey(sum)) {
+                    cycleMap.get(sum).add(i);
+                } else {
+                    cycleMap.put(sum, new ArrayList<>(Stream.of(i).toList()));
+                    if (startIdx == -1) {
+                        startIdx = i;
+                        //System.out.println("Found cycle start: " + startIdx);
+                    }
+                }
+            } else {
+                cycleSet.add(sum);
+                startIdx = -1;
+                cycleMap.clear();
+            }
+        }
+
+        int cycleLength = -1;
+        for (Map.Entry<Long, ArrayList<Integer>> entry : cycleMap.entrySet()) {
+            ArrayList<Integer> indexes = entry.getValue();
+            for (int i = 1, size = indexes.size(); i < size; i++) {
+                int length = indexes.get(i) - indexes.get(i - 1);
+                if (cycleLength == -1) {
+                    cycleLength = length;
+                } else if (cycleLength != length) {
+                    cycleLength = -1;
+                    break;
+                }
+            }
+            if (cycleLength != -1) {
+                System.out.println("Found cycle length: " + cycleLength);
+                System.out.println("Cycle start at index : " + (startIdx - cycleLength));
+                System.out.println("The first element of cycle is: " + sums.get(startIdx - cycleLength));
+                break;
+            }
+        }
+
+        return new int[][]{{startIdx - cycleLength, cycleLength}};
     }
 
     private static long getSum(ArrayList<String> output) {
