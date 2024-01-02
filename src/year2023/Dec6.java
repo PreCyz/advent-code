@@ -3,15 +3,13 @@ package year2023;
 import base.DecBase;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec6 extends DecBase {
 
-    public Dec6(String fileName) {
-        super(fileName);
+    public Dec6(int year) {
+        super(year, 6);
     }
 
     @Override

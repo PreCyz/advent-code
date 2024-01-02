@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import java.util.stream.Stream;
 
 class Dec25 extends DecBase {
-    protected Dec25(String fileName) {
-        super(fileName);
+    protected Dec25(int year) {
+        super(year, 25);
     }
 
     enum SNAFU {

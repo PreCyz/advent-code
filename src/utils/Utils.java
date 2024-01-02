@@ -1,6 +1,8 @@
 package utils;
 
 import java.io.*;
+import java.net.URI;
+import java.net.http.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +135,32 @@ public final class Utils {
             }
         } catch (IOException e) {
             System.err.println("UPS! " + e.getMessage());
+        }
+    }
+
+    public static void downloadInput(int year, int day, String cookieSession) {
+        Path inputsPath = Paths.get("", "inputs", String.valueOf(year), "%d.txt".formatted(day));
+
+        try (FileWriter fw = new FileWriter(inputsPath.toFile(), false);
+             BufferedWriter bw = new BufferedWriter(fw)){
+
+            String url = "https://adventofcode.com/%d/day/%d/input".formatted(year, day);
+            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(url))
+                    .header("Cookie", "session=%s".formatted(cookieSession))
+                    .GET()
+                    .build();
+
+            HttpResponse<Stream<String>> response = HttpClient.newHttpClient()
+                    .send(httpRequest, HttpResponse.BodyHandlers.ofLines());
+
+            for (String line : response.body().toList()) {
+                bw.write(line);
+                bw.newLine();
+            }
+            System.out.printf("File [%d.txt] downloaded to folder %d.%n", day, year);
+
+        } catch (IOException | InterruptedException e) {
+            System.err.printf("Could not download the input file for year %d day %d because: %s%n", year, day, e.getMessage());
         }
     }
 

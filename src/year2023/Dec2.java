@@ -14,8 +14,8 @@ class Dec2 extends DecBase {
     final String blueTxt = "blue";
     final String redTxt = "red";
     final String gameTxt = "Game";
-    public Dec2(String fileName) {
-        super(fileName);
+    public Dec2(int year) {
+        super(year, 2);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package year2022;
 
 import base.DecBase;
-import utils.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,11 +34,12 @@ public class Main2022 {
 //                new Dec15(Utils.getFilePath(inputsDir, "dec_15.txt")),
 //                new Dec16(Utils.getFilePath(inputsDir, "dec_16.txt")),
 //                new Dec19(Utils.getFilePath(inputsDir, "dec_19.txt")),
-                new Dec20(Utils.getFilePath(inputsDir, "dec_20.txt"))
+                new Dec20(2022)
 
         );
 
-        DecBase.runTasks(adventTasks);
+        String cookieSession = "";
+        DecBase.runTasks(adventTasks, cookieSession);
     }
 }
 

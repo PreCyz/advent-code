@@ -4,16 +4,13 @@ import base.DecBase;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec13 extends DecBase {
 
-    public Dec13(String fileName) {
-        super(fileName);
+    public Dec13(int year) {
+        super(year, 13);
     }
 
     @Override
@@ -41,9 +38,9 @@ class Dec13 extends DecBase {
     }
 
     public DecBase readInput() throws IOException {
-        System.out.printf("%nReading input from [%s]%n", getFileName());
+        System.out.printf("%nReading input from [%s]%n", getFilePath());
         inputStrings = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(getFilePath().toFile()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
                 if (nextLine != null) {

@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toCollection;
 
 class Dec10 extends DecBase {
-    protected Dec10(String fileName) {
-        super(fileName);
+    protected Dec10(int year) {
+        super(year, 10);
     }
 
     @Override

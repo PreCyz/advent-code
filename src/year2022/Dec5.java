@@ -14,8 +14,8 @@ class Dec5 extends DecBase {
     private LinkedList<Move> procedure;
     private ArrayList<LinkedList<String>> stacks;
 
-    public Dec5(String fileName) {
-        super(fileName);
+    public Dec5(int year) {
+        super(year, 5);
     }
 
     private static class Move {
@@ -74,9 +74,9 @@ class Dec5 extends DecBase {
 
     @Override
     public DecBase readInput() throws IOException {
-        System.out.printf("%nReading input from [%s]%n", getFileName());
+        System.out.printf("%nReading input from [%s]%n", getFilePath());
         inputStrings = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(getFilePath().toFile()))) {
             while (scanner.hasNext()) {
                 inputStrings.add(scanner.nextLine());
             }

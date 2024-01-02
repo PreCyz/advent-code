@@ -9,8 +9,8 @@ class Dec9 extends DecBase {
     private static final String TAIL = "T";
     private static final String HEAD = "H";
 
-    protected Dec9(String fileName) {
-        super(fileName);
+    protected Dec9(int year) {
+        super(year, 9);
     }
 
     @Override

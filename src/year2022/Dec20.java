@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Dec20 extends DecBase {
-    protected Dec20(String fileName) {
-        super(fileName);
+    protected Dec20(int year) {
+        super(year, 20);
     }
 
     LinkedList<Integer> integers;

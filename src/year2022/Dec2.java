@@ -156,8 +156,12 @@ class Dec2 extends DecBase {
         abstract Actions getLoose();
     }
 
-    public Dec2(String fileName) {
-        super(fileName);
+    public Dec2(int year) {
+        super(year, 2);
+    }
+
+    protected Dec2(int year, int day) {
+        super(year, day);
     }
 
     @Override

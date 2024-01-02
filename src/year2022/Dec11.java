@@ -6,8 +6,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 class Dec11 extends DecBase {
-    protected Dec11(String fileName) {
-        super(fileName);
+    protected Dec11(int year) {
+        super(year, 11);
     }
 
     static class Monkey {

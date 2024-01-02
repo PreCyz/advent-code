@@ -1,29 +1,28 @@
 package base;
 
+import utils.Utils;
+
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();
-    private final String fileName;
+    private final int year;
+    private final int day;
 
-    protected DecBase(String fileName) {
-        this.fileName = fileName;
-    }
-
-    protected DecBase() {
-        this("");
+    protected DecBase(int year, int day) {
+        this.year = year;
+        this.day = day;
     }
 
     public DecBase readInput() throws IOException {
-        System.out.printf("%nReading input from [%s]%n", getFileName());
+        System.out.printf("%nReading input from [%s]%n", getFilePath());
         inputStrings = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(getFilePath().toFile()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
                 if (nextLine != null && !nextLine.isEmpty()) {
@@ -34,8 +33,18 @@ public abstract class DecBase implements Runnable {
         return this;
     }
 
-    public String getFileName() {
-        return fileName;
+    private String getFileName() {
+        return "%d.txt".formatted(day);
+    }
+
+    protected Path getFilePath() {
+        return Paths.get("", "inputs", String.valueOf(year), getFileName());
+    }
+
+    private void downloadInput(String cookieSession) {
+        if (!Files.exists(getFilePath())) {
+            Utils.downloadInput(year, day, cookieSession);
+        }
     }
 
     @Override
@@ -61,12 +70,13 @@ public abstract class DecBase implements Runnable {
     public abstract DecBase readDefaultInput();
     protected abstract void calculatePart1();
 
-    public static void runTasks(List<DecBase> adventTasks) {
+    public static void runTasks(List<DecBase> adventTasks, String cookieSession) {
         for (DecBase task : adventTasks) {
             try {
                 System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
                 System.out.printf("*******************************%n");
                 task.readDefaultInput().run();
+                task.downloadInput(cookieSession);
                 task.readInput().run();
                 System.out.printf("*******************************%n");
             } catch (Exception e) {

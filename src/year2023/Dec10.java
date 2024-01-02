@@ -12,8 +12,8 @@ class Dec10 extends DecBase {
     final LinkedList<Point> loopPoints = new LinkedList<>();
     char[][] maze;
 
-    public Dec10(String fileName) {
-        super(fileName);
+    public Dec10(int year) {
+        super(year, 10);
     }
 
     private enum Shape {

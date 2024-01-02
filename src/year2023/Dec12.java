@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 class Dec12 extends DecBase {
 
-    public Dec12(String fileName) {
-        super(fileName);
+    public Dec12(int year) {
+        super(year, 12);
     }
 
     @Override

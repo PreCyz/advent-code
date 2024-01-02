@@ -1,7 +1,6 @@
 package year2015;
 
 import base.DecBase;
-import utils.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,10 +20,11 @@ public class Main2015 {
 //                new Dec3(Utils.getFilePath(inputsDir, "dec_3.txt")),
 //                new Dec4(Utils.getFilePath(inputsDir, "dec_4.txt")),
 //                new Dec5(Utils.getFilePath(inputsDir, "dec_5.txt")),
-                new Dec6(Utils.getFilePath(inputsDir, "dec_6.txt"))
+                new Dec6(2015)
         );
 
-        DecBase.runTasks(adventTasks);
+        String cookieSession = "";
+        DecBase.runTasks(adventTasks, cookieSession);
     }
 }
 

@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.stream.Stream;
 
 class Dec19 extends DecBase {
-    protected Dec19(String fileName) {
-        super(fileName);
+    protected Dec19(int year) {
+        super(year, 19);
     }
 
     class Cost {

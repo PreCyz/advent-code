@@ -11,8 +11,8 @@ class Dec1 extends DecBase {
 
     private LinkedList<Integer> inputIntegers;
 
-    public Dec1(String fileName) {
-        super(fileName);
+    public Dec1(int year) {
+        super(year, 1);
     }
 
     @Override
@@ -25,9 +25,9 @@ class Dec1 extends DecBase {
     }
 
     public DecBase readInput() throws IOException {
-        System.out.printf("%nReading input from [%s]%n", getFileName());
+        System.out.printf("%nReading input from [%s]%n", getFilePath());
         inputIntegers = new LinkedList<>();
-        try (Scanner scanner = new Scanner(new FileInputStream(getFileName()))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(getFilePath().toFile()))) {
             while (scanner.hasNext()) {
                 final String nextLine = scanner.nextLine();
                 if (nextLine == null || "".equals(nextLine)) {

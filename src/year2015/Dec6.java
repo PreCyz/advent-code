@@ -11,8 +11,8 @@ public class Dec6 extends DecBase {
 
     final int[][] grid = new int[GRID_SIZE][GRID_SIZE];
 
-    protected Dec6(String fileName) {
-        super(fileName);
+    protected Dec6(int year) {
+        super(year, 6);
     }
 
     @Override

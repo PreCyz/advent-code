@@ -2,16 +2,14 @@ package year2023;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec1 extends DecBase {
 
 
-    public Dec1(String fileName) {
-        super(fileName);
+    public Dec1(int year) {
+        super(year, 1);
     }
 
     @Override

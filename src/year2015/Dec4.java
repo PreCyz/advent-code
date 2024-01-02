@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 public class Dec4 extends DecBase {
 
-    protected Dec4(String fileName) {
-        super(fileName);
+    protected Dec4(int year) {
+        super(year, 4);
     }
 
     @Override

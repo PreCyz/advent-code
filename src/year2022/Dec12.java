@@ -97,8 +97,8 @@ class Dec12 extends DecBase {
         }
     }
 
-    protected Dec12(String fileName) {
-        super(fileName);
+    protected Dec12(int year) {
+        super(year, 12);
     }
 
     @Override

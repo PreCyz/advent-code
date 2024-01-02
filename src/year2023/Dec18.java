@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 public class Dec18 extends DecBase {
 
-    public Dec18(String fileName) {
-        super(fileName);
+    public Dec18(int year) {
+        super(year, 18);
     }
 
     public enum Direction {

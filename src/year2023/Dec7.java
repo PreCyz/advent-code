@@ -2,19 +2,14 @@ package year2023;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 
 class Dec7 extends DecBase {
 
-    public Dec7(String fileName) {
-        super(fileName);
+    public Dec7(int year) {
+        super(year, 7);
     }
 
     private static final Map<Character, Integer> CARDS = new HashMap<>();

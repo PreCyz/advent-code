@@ -2,15 +2,13 @@ package year2023;
 
 import base.DecBase;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec16 extends DecBase {
 
-    public Dec16(String fileName) {
-        super(fileName);
+    public Dec16(int year) {
+        super(year, 16);
     }
 
     private static class Point {

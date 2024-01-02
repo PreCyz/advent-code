@@ -25,8 +25,8 @@ class Dec7 extends DecBase {
     private Map<String, Long> sizeMap;
     private Map<String, Long> finalSizeMap;
 
-    public Dec7(String fileName) {
-        super(fileName);
+    public Dec7(int year) {
+        super(year, 7);
     }
 
     private record FileSystem(

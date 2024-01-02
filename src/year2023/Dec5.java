@@ -4,21 +4,15 @@ import base.DecBase;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 class Dec5 extends DecBase {
 
-    public Dec5(String fileName) {
-        super(fileName);
+    public Dec5(int year) {
+        super(year, 5);
     }
 
     @Override

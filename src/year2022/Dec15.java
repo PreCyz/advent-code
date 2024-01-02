@@ -14,8 +14,8 @@ class Dec15 extends DecBase {
     private static final String AIR = ".";
     private static final String SAND = "o";
 
-    protected Dec15(String fileName) {
-        super(fileName);
+    protected Dec15(int year) {
+        super(year, 15);
     }
 
     @Override
