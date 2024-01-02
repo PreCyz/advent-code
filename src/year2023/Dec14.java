@@ -1,9 +1,12 @@
 package year2023;
 
 import base.DecBase;
+import utils.Sequence;
 import utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 class Dec14 extends DecBase {
@@ -94,40 +97,26 @@ class Dec14 extends DecBase {
 
         ArrayList<String> output = new ArrayList<>(inputStrings);
         ArrayList<Long> sums = new ArrayList<>(numberOfCycles);
-        LinkedList<Long> sumCycle = new LinkedList<>();
-        int duplicateCounter = 0;
-/*
+
+        Sequence sequence = new Sequence();
+
         for (int cycle = 1; cycle <= numberOfCycles; ++cycle) {
             output = Utils.transpose(tiltNorth(Utils.transpose(output)));
             output = tiltWest(output);
             output = Utils.transpose(tiltSouth(Utils.transpose(output)));
             output = tiltEast(output);
-            long sum = getSum(Utils.transpose(output));
+            sums.add(getSum(Utils.transpose(output)));
 
-            if (sums.contains(sum)) {
-                duplicateCounter++;
-                sumCycle.add(sum);
-                System.out.printf("cycle %d - sum %d [duplicate]%n", cycle, sum);
-            } else {
-                duplicateCounter = 0;
-                sumCycle.clear();
-                //System.out.printf("cycle %d - sum %d%n", cycle, sum);
-            }
-            sums.add(sum);
-            if (duplicateCounter == 100) {
-                System.out.println("100 times in a row duplicate detected. Breaking the loop");
+            if (cycle % 250 == 0) {
+                sequence = Sequence.findSequence(sums);
                 break;
             }
-        }*/
+        }
 
-        int completeCycle = 38;
-        //completeCycle = sumCycle.size();
-        int cycleStart = 102;
-
-        long number = (numberOfCycles - cycleStart) % completeCycle;
-        //long sum = getSum(output);
+        int number = (numberOfCycles - 1 - sequence.startIdx) % sequence.length;
+        long sum = sums.get(number + sequence.startIdx);
         //right answer is 93102
-        System.out.printf("Part 2 - Total score %d%n", number);
+        System.out.printf("Part 2 - Total score %d%n", sum);
     }
 
     private static long getSum(ArrayList<String> output) {
