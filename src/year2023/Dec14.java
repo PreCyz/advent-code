@@ -1,9 +1,12 @@
 package year2023;
 
 import base.DecBase;
+import utils.Sequence;
 import utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 class Dec14 extends DecBase {
@@ -95,7 +98,7 @@ class Dec14 extends DecBase {
         ArrayList<String> output = new ArrayList<>(inputStrings);
         ArrayList<Long> sums = new ArrayList<>(numberOfCycles);
 
-        int[][] cycleDetails = new int[][]{};
+        Sequence sequence = new Sequence();
 
         for (int cycle = 1; cycle <= numberOfCycles; ++cycle) {
             output = Utils.transpose(tiltNorth(Utils.transpose(output)));
@@ -104,64 +107,16 @@ class Dec14 extends DecBase {
             output = tiltEast(output);
             sums.add(getSum(Utils.transpose(output)));
 
-            if (cycle % 500 == 0) {
-                cycleDetails = findCycle(sums);
+            if (cycle % 250 == 0) {
+                sequence = Sequence.findSequence(sums);
                 break;
             }
         }
 
-        int cycleStartIdx = cycleDetails[0][0];
-        int cycleLength = cycleDetails[0][1];
-        int number = (numberOfCycles - cycleStartIdx) % cycleLength;
-        long sum = sums.get(number + cycleStartIdx - 1);
+        int number = (numberOfCycles - 1 - sequence.startIdx) % sequence.length;
+        long sum = sums.get(number + sequence.startIdx);
         //right answer is 93102
         System.out.printf("Part 2 - Total score %d%n", sum);
-    }
-
-    private int[][] findCycle(ArrayList<Long> sums) {
-        LinkedHashSet<Long> cycleSet = new LinkedHashSet<>();
-        Map<Long, ArrayList<Integer>> cycleMap = new HashMap<>();
-        int startIdx = -1;
-        for (int i = 0; i < sums.size(); i++) {
-            Long sum = sums.get(i);
-            if (cycleSet.contains(sum)) {
-                if (cycleMap.containsKey(sum)) {
-                    cycleMap.get(sum).add(i);
-                } else {
-                    cycleMap.put(sum, new ArrayList<>(Stream.of(i).toList()));
-                    if (startIdx == -1) {
-                        startIdx = i;
-                        //System.out.println("Found cycle start: " + startIdx);
-                    }
-                }
-            } else {
-                cycleSet.add(sum);
-                startIdx = -1;
-                cycleMap.clear();
-            }
-        }
-
-        int cycleLength = -1;
-        for (Map.Entry<Long, ArrayList<Integer>> entry : cycleMap.entrySet()) {
-            ArrayList<Integer> indexes = entry.getValue();
-            for (int i = 1, size = indexes.size(); i < size; i++) {
-                int length = indexes.get(i) - indexes.get(i - 1);
-                if (cycleLength == -1) {
-                    cycleLength = length;
-                } else if (cycleLength != length) {
-                    cycleLength = -1;
-                    break;
-                }
-            }
-            if (cycleLength != -1) {
-                System.out.println("Found cycle length: " + cycleLength);
-                System.out.println("Cycle start at index : " + (startIdx - cycleLength));
-                System.out.println("The first element of cycle is: " + sums.get(startIdx - cycleLength));
-                break;
-            }
-        }
-
-        return new int[][]{{startIdx - cycleLength, cycleLength}};
     }
 
     private static long getSum(ArrayList<String> output) {
