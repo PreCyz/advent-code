@@ -1,28 +1,24 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Sequence {
     public int startIdx;
     public int length;
     public final ArrayList<Long> elements;
+    public final Map<Long, Integer> occurrenceMap;
 
-    public Sequence(){
-        elements = new ArrayList<>();
-    }
-    private Sequence(int startIdx, int length, ArrayList<Long> elements) {
+    private Sequence(int startIdx, int length, ArrayList<Long> elements, Map<Long, Integer> occurrenceMap) {
         this.startIdx = startIdx;
         this.length = length;
         this.elements = elements;
+        this.occurrenceMap = occurrenceMap;
     }
 
     public static Sequence findSequence(ArrayList<Long> sums) {
         LinkedHashSet<Long> sequenceSet = new LinkedHashSet<>();
-        Map<Long, ArrayList<Integer>> sequenceMap = new HashMap<>();
+        LinkedHashMap<Long, ArrayList<Integer>> sequenceMap = new LinkedHashMap<>();
         int startIdx = -1;
         for (int i = 0; i < sums.size(); i++) {
             Long sum = sums.get(i);
@@ -44,6 +40,7 @@ public class Sequence {
         }
 
         int sequenceLength = -1;
+        Map<Long, Integer> occurrenceMap = new LinkedHashMap<>();
         for (Map.Entry<Long, ArrayList<Integer>> entry : sequenceMap.entrySet()) {
             ArrayList<Integer> indexes = entry.getValue();
             for (int i = 1, size = indexes.size(); i < size; i++) {
@@ -56,13 +53,37 @@ public class Sequence {
                 }
             }
             if (sequenceLength != -1) {
-                System.out.println("Found sequence length: " + sequenceLength);
+                System.out.printf("%nFound sequence length: %d%n", sequenceLength);
                 System.out.println("Sequence start at index : " + (startIdx - sequenceLength));
-                System.out.println("The first element of cycle is: " + sums.get(startIdx - sequenceLength));
+                System.out.printf("The first element of cycle is: %d%n%n", sums.get(startIdx - sequenceLength));
                 break;
             }
         }
 
-        return new Sequence(startIdx - sequenceLength, sequenceLength, new ArrayList<>(sums.subList(startIdx - sequenceLength, startIdx)));
+        for (Map.Entry<Long, ArrayList<Integer>> entry : sequenceMap.entrySet()) {
+            occurrenceMap.putAll(checkMultipleOccurrences(sequenceLength, entry));
+        }
+
+        return new Sequence(
+                startIdx - sequenceLength,
+                sequenceLength,
+                new ArrayList<>(sums.subList(startIdx - sequenceLength, startIdx)),
+                occurrenceMap
+        );
     }
+
+    private static Map<Long, Integer> checkMultipleOccurrences(int sequenceLength, Map.Entry<Long, ArrayList<Integer>> entry) {
+        Map<Long, Integer> occurrenceMap = new HashMap<>();
+        ArrayList<Integer> indexes = entry.getValue();
+        for (int i = 0; i < 1; i++) {
+            Set<Integer> occurrences = new HashSet<>();
+            for (int j = 1, size = indexes.size(); j < size; j++) {
+                occurrences.add(indexes.get(j) - indexes.get(i));
+            }
+            long occurrence = occurrences.stream().map(it -> it % sequenceLength).distinct().count();
+            occurrenceMap.putIfAbsent(entry.getKey(), (int) occurrence);
+        }
+        return occurrenceMap;
+    }
+
 }

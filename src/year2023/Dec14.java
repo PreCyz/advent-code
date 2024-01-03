@@ -4,9 +4,9 @@ import base.DecBase;
 import utils.Sequence;
 import utils.Utils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec14 extends DecBase {
@@ -98,7 +98,7 @@ class Dec14 extends DecBase {
         ArrayList<String> output = new ArrayList<>(inputStrings);
         ArrayList<Long> sums = new ArrayList<>(numberOfCycles);
 
-        Sequence sequence = new Sequence();
+        Sequence sequence = null;
 
         for (int cycle = 1; cycle <= numberOfCycles; ++cycle) {
             output = Utils.transpose(tiltNorth(Utils.transpose(output)));
@@ -107,8 +107,11 @@ class Dec14 extends DecBase {
             output = tiltEast(output);
             sums.add(getSum(Utils.transpose(output)));
 
-            if (cycle % 250 == 0) {
+            if (cycle % 200 == 0) {
+                LocalDateTime start = LocalDateTime.now();
                 sequence = Sequence.findSequence(sums);
+                Duration duration = Duration.between(start, LocalDateTime.now());
+                System.out.printf("Found sequence in sec %d millis %d %n", duration.toSecondsPart(), duration.toMillisPart());
                 break;
             }
         }
