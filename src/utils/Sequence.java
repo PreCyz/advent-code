@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -98,15 +99,19 @@ public class Sequence {
 
     private static Map<Long, Integer> checkMultipleOccurrences(int sequenceLength, Map.Entry<Long, ArrayList<Integer>> entry) {
         Map<Long, Integer> occurrenceMap = new HashMap<>();
-        ArrayList<Integer> indexes = entry.getValue();
-        for (int i = 0; i < 1; i++) {
+
+        LinkedList<Integer> indexes = new LinkedList<>(entry.getValue());
+        if (indexes.size() == 1) {
+            occurrenceMap.putIfAbsent(entry.getKey(), 1);
+        } else {
             Set<Integer> occurrences = new HashSet<>();
             for (int j = 1, size = indexes.size(); j < size; j++) {
-                occurrences.add(indexes.get(j) - indexes.get(i));
+                occurrences.add(indexes.get(j) - indexes.getFirst());
             }
             long occurrence = occurrences.stream().map(it -> it % sequenceLength).distinct().count();
             occurrenceMap.putIfAbsent(entry.getKey(), (int) occurrence);
         }
+
         return occurrenceMap;
     }
 
