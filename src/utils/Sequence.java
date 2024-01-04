@@ -1,13 +1,19 @@
 package utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class Sequence {
-    public int startIdx;
-    public int length;
-    public final ArrayList<Long> elements;
-    public final Map<Long, Integer> occurrenceMap;
+    public final int startIdx;
+    public final int length;
+    private final ArrayList<Long> elements;
+    private final Map<Long, Integer> occurrenceMap;
 
     private Sequence(int startIdx, int length, ArrayList<Long> elements, Map<Long, Integer> occurrenceMap) {
         this.startIdx = startIdx;
@@ -16,9 +22,35 @@ public class Sequence {
         this.occurrenceMap = occurrenceMap;
     }
 
+    public ArrayList<Long> elements() {
+        return new ArrayList<>(elements);
+    }
+
+    public Map<Long, Integer> occurrenceMap() {
+        return new LinkedHashMap<>(occurrenceMap);
+    }
+
     public static Sequence findSequence(ArrayList<Long> sums) {
-        LinkedHashSet<Long> sequenceSet = new LinkedHashSet<>();
         LinkedHashMap<Long, ArrayList<Integer>> sequenceMap = new LinkedHashMap<>();
+        int startIdx = findStartIdxAndUpdateSequenceMap(sums, sequenceMap);
+
+        int sequenceLength = findSequenceLength(sequenceMap, startIdx, sums);
+
+        Map<Long, Integer> occurrenceMap = new LinkedHashMap<>();
+        for (Map.Entry<Long, ArrayList<Integer>> entry : sequenceMap.entrySet()) {
+            occurrenceMap.putAll(checkMultipleOccurrences(sequenceLength, entry));
+        }
+
+        return new Sequence(
+                startIdx - sequenceLength,
+                sequenceLength,
+                new ArrayList<>(sums.subList(startIdx - sequenceLength, startIdx)),
+                occurrenceMap
+        );
+    }
+
+    private static int findStartIdxAndUpdateSequenceMap(ArrayList<Long> sums, Map<Long, ArrayList<Integer>> sequenceMap) {
+        LinkedHashSet<Long> sequenceSet = new LinkedHashSet<>();
         int startIdx = -1;
         for (int i = 0; i < sums.size(); i++) {
             Long sum = sums.get(i);
@@ -38,9 +70,11 @@ public class Sequence {
                 sequenceMap.clear();
             }
         }
+        return startIdx;
+    }
 
+    private static int findSequenceLength(Map<Long, ArrayList<Integer>> sequenceMap, int startIdx, ArrayList<Long> sums) {
         int sequenceLength = -1;
-        Map<Long, Integer> occurrenceMap = new LinkedHashMap<>();
         for (Map.Entry<Long, ArrayList<Integer>> entry : sequenceMap.entrySet()) {
             ArrayList<Integer> indexes = entry.getValue();
             for (int i = 1, size = indexes.size(); i < size; i++) {
@@ -59,17 +93,7 @@ public class Sequence {
                 break;
             }
         }
-
-        for (Map.Entry<Long, ArrayList<Integer>> entry : sequenceMap.entrySet()) {
-            occurrenceMap.putAll(checkMultipleOccurrences(sequenceLength, entry));
-        }
-
-        return new Sequence(
-                startIdx - sequenceLength,
-                sequenceLength,
-                new ArrayList<>(sums.subList(startIdx - sequenceLength, startIdx)),
-                occurrenceMap
-        );
+        return sequenceLength;
     }
 
     private static Map<Long, Integer> checkMultipleOccurrences(int sequenceLength, Map.Entry<Long, ArrayList<Integer>> entry) {

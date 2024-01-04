@@ -34,7 +34,7 @@ public class Main2023 {
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_24.txt"))
         );
 
-        String cookieSession = "53616c7465645f5fb509c0a5e44a86a5879eda8636a6d460e6729f2b1de43163751a8058411e6cc0de89509c8309943792d0aea8f67c7ceadf4a63efc25c838d";
+        String cookieSession = "";
         DecBase.runTasks(adventTasks, cookieSession);
     }
 }
