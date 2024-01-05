@@ -1,11 +1,13 @@
 package utils;
 
+import year2023.dec19.Condition;
+
 import java.io.*;
 import java.net.URI;
 import java.net.http.*;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class Utils {
@@ -164,4 +166,23 @@ public final class Utils {
         }
     }
 
+    public static void writeToFile(LinkedList<ArrayList<Condition>> data) {
+        String fileName = "output.txt";
+        try {
+            Files.deleteIfExists(Paths.get(".", fileName));
+        } catch (IOException e) {
+            System.err.println("UPS! " + e.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(fileName, true);
+             BufferedWriter bw = new BufferedWriter(fw)
+        ) {
+            for (ArrayList<Condition> conditions : data) {
+                bw.write(conditions.stream().map(Condition::name).collect(Collectors.joining(" ^ ")));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("UPS! " + e.getMessage());
+        }
+    }
 }

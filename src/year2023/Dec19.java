@@ -1,20 +1,14 @@
 package year2023;
 
 import base.DecBase;
+import utils.Utils;
+import year2023.dec19.Node;
+import year2023.dec19.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.stream.*;
 
 public class Dec19 extends DecBase {
 
@@ -57,49 +51,9 @@ public class Dec19 extends DecBase {
                 "{x=2036,m=264,a=79,s=2244}",
                 "{x=2461,m=1339,a=466,s=291}",
                 "{x=2127,m=1623,a=2188,s=1013}"*/
+                //167409079868000 distinct combinations of ratings that will be accepted
         ).toList());
         return this;
-    }
-
-    private static class Workflow {
-        String name;
-        ArrayList<Condition> conditions;
-
-        Workflow(String name) {
-            this.name = name;
-            conditions = new ArrayList<>();
-        }
-
-        @Override
-        public String toString() {
-            return "Workflow{" +
-                    "name='" + name + '\'' +
-                    '}';
-        }
-    }
-
-    private static class Part {
-        int x;
-        int m;
-        int a;
-        int s;
-
-        Part(int x, int m, int a, int s) {
-            this.x = x;
-            this.m = m;
-            this.a = a;
-            this.s = s;
-        }
-
-        @Override
-        public String toString() {
-            return "Part{" +
-                    "x=" + x +
-                    ", m=" + m +
-                    ", a=" + a +
-                    ", s=" + s +
-                    '}';
-        }
     }
 
     @Override
@@ -270,81 +224,47 @@ public class Dec19 extends DecBase {
         findAllA(root);
         result.removeLast();
 
+        Utils.writeToFile(result);
+
         long sum = 0;
-        Set<Integer> xes = new HashSet<>();
-        Set<Integer> mes = new HashSet<>();
-        Set<Integer> aes = new HashSet<>();
-        Set<Integer> ses = new HashSet<>();
+        long sumR = 0;
         for (ArrayList<Condition> conditions : result) {
-            System.out.println(conditions.stream().map(Condition::name).collect(Collectors.joining(" ^ ")));
-            long x = findPartNumber('x', conditions);
+//            System.out.println(conditions.stream().map(Condition::name).collect(Collectors.joining(" ^ ")));
+            long partSum = 1;
+
+            long x = findPartCount('x', conditions);
+//            System.out.printf("X=%d", x);
             Set<Integer> range = findRangeByPartName('x', conditions);
-            System.out.printf("x=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
-            if (range.size() < 4000) {
-                xes.addAll(range);
-            }
-            //System.out.printf("x = %d ", x);
+//            System.out.printf("[%d] ", range.size());
+            partSum *= range.size();
 
-            long m = findPartNumber('m', conditions);
+            long m = findPartCount('m', conditions);
+//            System.out.printf("M=%d", m);
             range = findRangeByPartName('m', conditions);
-            System.out.printf("m=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
-            if (range.size() < 4000) {
-                mes.addAll(range);
-            }
-            //System.out.printf("m = %d ", m);
+//            System.out.printf("[%d] ", range.size());
+            partSum *= range.size();
 
-            long s = findPartNumber('s', conditions);
+            long s = findPartCount('s', conditions);
+//            System.out.printf("S=%d", s);
             range = findRangeByPartName('s', conditions);
-            System.out.printf("s=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
-            if (range.size() < 4000) {
-                ses.addAll(range);
-            }
-            //System.out.printf("s = %d ", s);
+//            System.out.printf("[%d] ", range.size());
+            partSum *= range.size();
 
-            long a = findPartNumber('a', conditions);
+            long a = findPartCount('a', conditions);
+//            System.out.printf("A=%d", a);
             range = findRangeByPartName('a', conditions);
-            System.out.printf("a=<%d,%d>%n", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
-            if (range.size() < 4000) {
-                aes.addAll(range);
-            }
-            //System.out.printf("a = %d => possibilities %d%n", a, x * m * s * a);
+//            System.out.printf("[%d]%n", range.size());
+            partSum *= range.size();
+
+//            System.out.printf("X*M*S*A= %d [range]  combinations%n", partSum);
+            sumR+=partSum;
 
             sum+= x * m * s * a;
-
-            LinkedList<Integer> X = new LinkedList<>(xes);
-            if (X.isEmpty()) {
-                System.out.print("x=0 ");
-            } else {
-                System.out.printf("X=<%d,%d> ", X.getFirst(), X.getLast());
-            }
-            LinkedList<Integer> M = new LinkedList<>(mes);
-            if (M.isEmpty()) {
-                System.out.print("m=0 ");
-            } else {
-                System.out.printf("m=<%d,%d> ", M.getFirst(), M.getLast());
-            }
-            LinkedList<Integer> S = new LinkedList<>(ses);
-            if (S.isEmpty()) {
-                System.out.print("s=0 ");
-            } else {
-                System.out.printf("s=<%d,%d> ", S.getFirst(), S.getLast());
-            }
-            LinkedList<Integer> A = new LinkedList<>(aes);
-            if (A.isEmpty()) {
-                System.out.print("a=0 ");
-            } else {
-                System.out.printf("a=<%d,%d>%n", A.getFirst(), A.getLast());
-            }
-
-            System.out.printf("X=[%d] ", X.size());
-            System.out.printf("M=[%d] ", M.size());
-            System.out.printf("S=[%d] ", S.size());
-            System.out.printf("A=[%d]%n%n", A.size());
-
+//            System.out.printf("X*M*S*A= %d distinct combinations%n%n", partSum);
         }
-        sum = (long) xes.size() * mes.size() * aes.size() * ses.size();
 
         System.out.printf("Part 2 - Total score %d%n", sum);
+        System.out.printf("Part 2 - Total score %d[R]%n", sumR);
     }
 
     private Node buildTree(Map<String, Workflow> workflowMap) {
@@ -424,7 +344,7 @@ public class Dec19 extends DecBase {
         }
     }
 
-    int findPartNumber(char partName, ArrayList<Condition> conditions) {
+    private int findPartCount(char partName, ArrayList<Condition> conditions) {
         final int MAX_VALUE = 4000;
         List<Condition> conditionsByPart = conditions.stream().filter(it -> it.part == partName).toList();
         if (conditionsByPart.isEmpty()) {
@@ -432,7 +352,7 @@ public class Dec19 extends DecBase {
         } else {
             switch (RelationType.valueOf(conditionsByPart)) {
                 case GT -> {
-                    return MAX_VALUE - conditionsByPart.stream().mapToInt(it -> it.intValue).max().getAsInt() - 1;
+                    return MAX_VALUE - conditionsByPart.stream().mapToInt(it -> it.intValue).max().getAsInt();
                 }
                 case LT -> {
                     return conditionsByPart.stream().mapToInt(it -> it.intValue).min().getAsInt() - 1;
@@ -441,13 +361,13 @@ public class Dec19 extends DecBase {
                     int ltMin = conditionsByPart.stream().filter(it -> it.relation == '<')
                             .mapToInt(it -> it.intValue)
                             .min()
-                            .getAsInt() - 1;
+                            .getAsInt();
                     int gtMax = conditionsByPart.stream()
                             .filter(it -> it.relation == '>')
                             .mapToInt(it -> it.intValue)
                             .max()
-                            .getAsInt() - 1;
-                    return ltMin - gtMax;
+                            .getAsInt();
+                    return ltMin - gtMax - 1;
                 }
                 default -> {
                     return 0;
@@ -456,7 +376,7 @@ public class Dec19 extends DecBase {
         }
     }
 
-    Set<Integer> findRangeByPartName(char partName, ArrayList<Condition> conditions) {
+    private Set<Integer> findRangeByPartName(char partName, ArrayList<Condition> conditions) {
         final int MAX_VALUE = 4000;
         List<Condition> conditionsByPart = conditions.stream().filter(it -> it.part == partName).toList();
         if (conditionsByPart.isEmpty()) {
@@ -480,7 +400,7 @@ public class Dec19 extends DecBase {
                             .filter(it -> it.relation == '>')
                             .mapToInt(it -> it.intValue)
                             .max()
-                            .getAsInt() - 1;
+                            .getAsInt() + 1;
                     return IntStream.range(gtMax, ltMin).boxed().collect(Collectors.toCollection(HashSet::new));
                 }
                 default -> {
@@ -490,119 +410,4 @@ public class Dec19 extends DecBase {
         }
     }
 
-    private static class Condition {
-        char part;
-        char relation;
-        int intValue;
-        boolean negate;
-        String nextWorkflowName;
-        String currentWorkflowName;
-
-        Condition(String nextWorkflowName) {
-            this.nextWorkflowName = nextWorkflowName;
-        }
-
-        Condition(Condition condition) {
-            this(condition.part, condition.relation, condition.intValue, condition.nextWorkflowName, condition.currentWorkflowName);
-        }
-
-        Condition(char part, char relation, int intValue, String nextWorkflowName, String currentWorkflowName) {
-            this.part = part;
-            this.relation = relation;
-            this.intValue = intValue;
-            this.nextWorkflowName = nextWorkflowName;
-            this.currentWorkflowName = currentWorkflowName;
-        }
-
-        boolean isTerminator() {
-            return isAccepted() || isRejected();
-        }
-
-        boolean isAccepted() {
-            return intValue == 0 && "A".equals(nextWorkflowName);
-        }
-
-        boolean isRejected() {
-            return intValue == 0 && "R".equals(nextWorkflowName);
-        }
-
-        void negate() {
-            negate = true;
-            if (relation == '>') {
-                relation = '<';
-                intValue++;
-            } else {
-                relation = '>';
-                intValue--;
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "Condition{" +
-                    part + relation + intValue +
-                    ", negate=" + negate +
-                    ", currentWorkflowName='" + currentWorkflowName + '\'' +
-                    ", nextWorkflowName='" + nextWorkflowName + '\'' +
-                    '}';
-        }
-
-        String name() {
-            return "" + part + relation + intValue;
-        }
-
-        public boolean isOnlyNextWorkflowName() {
-            return !isTerminator() && intValue == 0 && !nextWorkflowName.isEmpty() && currentWorkflowName == null;
-        }
-    }
-
-    private static class Node {
-        Condition condition;
-        String name;
-
-        final ArrayList<Condition> conditionsSoFar = new ArrayList<>();
-        Node trueNode;
-        Node falseNode;
-
-        Node(String name, Condition condition) {
-            this.condition = condition;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        boolean isA() {
-            return "A".equals(name) && condition == null;
-        }
-
-        boolean isR() {
-            return "R".equals(name) && condition == null;
-        }
-    }
-
-    enum RelationType {
-        GT, LT, COMMON, NONE;
-
-        static RelationType valueOf(List<Condition> conditions) {
-            LinkedList<Character> relations = new LinkedList<>(conditions.stream().map(it -> it.relation).toList());
-            long count = relations.stream().distinct().count();
-            if (count == 1) {
-                if (relations.getFirst() == '<') {
-                    return LT;
-                } else {
-                    return GT;
-                }
-            } else if (relations.contains('<') && relations.contains('>')) {
-                int ltMin = conditions.stream().filter(it -> it.relation == '<').mapToInt(it -> it.intValue).min().getAsInt();
-                int gtMax = conditions.stream().filter(it -> it.relation == '>').mapToInt(it -> it.intValue).max().getAsInt();
-                if (ltMin >= gtMax) {
-                    return COMMON;
-                }
-            }
-            return NONE;
-        }
-    }
 }
