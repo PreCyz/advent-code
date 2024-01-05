@@ -41,55 +41,15 @@ public class Dec19 extends DecBase {
                 "in{s<1351:px,qqz}",
                 "qqz{s>2770:qs,m<1801:hdj,R}",
                 "gd{a>3333:R,R}",
-                "hdj{m>838:A,pv}",
+                "hdj{m>838:A,pv}"/*,
                 "\n",
                 "{x=787,m=2655,a=1222,s=2876}",
                 "{x=1679,m=44,a=2067,s=496}",
                 "{x=2036,m=264,a=79,s=2244}",
                 "{x=2461,m=1339,a=466,s=291}",
-                "{x=2127,m=1623,a=2188,s=1013}"
+                "{x=2127,m=1623,a=2188,s=1013}"*/
         ).toList());
         return this;
-    }
-
-    private static class Condition {
-        char part;
-        char relation;
-        int intValue;
-        String nextWorkflowName;
-
-        public Condition(String nextWorkflowName) {
-            this.nextWorkflowName = nextWorkflowName;
-        }
-
-        Condition(char part, char relation, int intValue, String nextWorkflowName) {
-            this.part = part;
-            this.relation = relation;
-            this.intValue = intValue;
-            this.nextWorkflowName = nextWorkflowName;
-        }
-
-        boolean isTerminator() {
-            return isAccepted() || isRejected();
-        }
-
-        boolean isAccepted() {
-            return intValue == 0 && "A".equals(nextWorkflowName);
-        }
-
-        boolean isRejected() {
-            return intValue == 0 && "R".equals(nextWorkflowName);
-        }
-
-        @Override
-        public String toString() {
-            return "Condition{" +
-                    "part=" + part +
-                    ", relation=" + relation +
-                    ", intValue=" + intValue +
-                    ", nextWorkflowName='" + nextWorkflowName + '\'' +
-                    '}';
-        }
     }
 
     private static class Workflow {
@@ -275,7 +235,7 @@ public class Dec19 extends DecBase {
                 String[] split = ins.substring(2).split(":");
                 int intValue = Integer.parseInt(split[0]);
                 String nextFlowName = split[1];
-                workflow.conditions.add(new Condition(part, relation, intValue, nextFlowName));
+                workflow.conditions.add(new Condition(part, relation, intValue, nextFlowName, workflowName));
             } else {
                 workflow.conditions.add(new Condition(ins));
             }
@@ -285,7 +245,250 @@ public class Dec19 extends DecBase {
 
     @Override
     protected void calculatePart2() {
+        Map<String, Workflow> workflowMap = new HashMap<>();
+        for (String line : inputStrings) {
+            if (line.isEmpty()) {
+                break;
+            }
+            Workflow workflow = createWorkflow(line);
+            workflowMap.put(workflow.name, workflow);
+        }
+
+        Node root = buildTree(workflowMap);
+
+        result = new LinkedList<>();
+        result.add(new ArrayList<>());
+        findAllA(root);
+        result.removeLast();
+
         long sum = 0;
+        for (ArrayList<Condition> conditions : result) {
+            long x = findPartNumber('x', conditions);
+            long m = findPartNumber('m', conditions);
+            long s = findPartNumber('s', conditions);
+            long a = findPartNumber('a', conditions);
+            sum+= x * m * s * a;
+        }
+
         System.out.printf("Part 2 - Total score %d%n", sum);
+    }
+
+    private Node buildTree(Map<String, Workflow> workflowMap) {
+        Condition startCondition = getNextCondition("in", workflowMap);
+        Node root = new Node(startCondition.name(), startCondition);
+
+        Condition secondCondition = getNextCondition(startCondition.nextWorkflowName, workflowMap);
+        root.trueNode = addRecursive(root.trueNode, secondCondition, workflowMap);
+
+        Condition in = getNextCondition("in", workflowMap);
+        if (in.isOnlyNextWorkflowName()) {
+            in = getNextCondition(in.nextWorkflowName, workflowMap);
+        }
+        root.falseNode = addRecursive(root.falseNode, in, workflowMap);
+
+        return root;
+    }
+
+    Condition getNextCondition(String workflowName, Map<String, Workflow> workflowMap) {
+        if ("A".equals(workflowName) || "R".equals(workflowName)) {
+            return new Condition(workflowName);
+        }
+        Workflow workflow = workflowMap.get(workflowName);
+        if (workflow == null || workflow.conditions.isEmpty()) {
+            return null;
+        }
+        return workflow.conditions.remove(0);
+    }
+
+    private LinkedList<ArrayList<Condition>> result;
+
+    private Node addRecursive(Node current, Condition condition, Map<String, Workflow> workflowMap) {
+        if (condition == null) {
+            return current;
+        }
+        if (current == null) {
+            if (condition.isTerminator()) {
+                return new Node(condition.nextWorkflowName, null);
+            }
+            Node node = new Node(condition.name(), condition);
+            node.trueNode = addRecursive(node.trueNode, getNextCondition(condition.nextWorkflowName, workflowMap), workflowMap);
+
+            Condition removed = getNextCondition(condition.currentWorkflowName, workflowMap);
+            if (removed == null) {
+                removed = getNextCondition(condition.currentWorkflowName, workflowMap);
+            } else if (removed.isOnlyNextWorkflowName()) {
+                removed = getNextCondition(removed.nextWorkflowName, workflowMap);
+            }
+            node.falseNode = addRecursive(node.falseNode, removed, workflowMap);
+            return node;
+        }
+        return current;
+    }
+
+    private void findAllA(Node node) {
+        if (node.condition == null) {
+            if ("A".equals(node.name)) {
+                result.removeLast();
+                result.addLast(new ArrayList<>(node.conditionsSoFar));
+                result.addLast(new ArrayList<>());
+            }
+            return;
+        }
+
+        node.conditionsSoFar.add(node.condition);
+
+        if (node.trueNode != null) {
+            node.trueNode.conditionsSoFar.addAll(node.conditionsSoFar);
+            findAllA(node.trueNode);
+        }
+        if (node.falseNode != null) {
+            Condition negate = new Condition(node.condition);
+            negate.negate();
+            node.falseNode.conditionsSoFar.addAll(node.conditionsSoFar);
+            node.falseNode.conditionsSoFar.set(node.conditionsSoFar.size() - 1, negate);
+            findAllA(node.falseNode);
+        }
+    }
+
+    private static class Condition {
+        char part;
+        char relation;
+        int intValue;
+        boolean negate;
+        String nextWorkflowName;
+        String currentWorkflowName;
+
+        Condition(String nextWorkflowName) {
+            this.nextWorkflowName = nextWorkflowName;
+        }
+
+        Condition(Condition condition) {
+            this(condition.part, condition.relation, condition.intValue, condition.nextWorkflowName, condition.currentWorkflowName);
+        }
+
+        Condition(char part, char relation, int intValue, String nextWorkflowName, String currentWorkflowName) {
+            this.part = part;
+            this.relation = relation;
+            this.intValue = intValue;
+            this.nextWorkflowName = nextWorkflowName;
+            this.currentWorkflowName = currentWorkflowName;
+        }
+
+        boolean isTerminator() {
+            return isAccepted() || isRejected();
+        }
+
+        boolean isAccepted() {
+            return intValue == 0 && "A".equals(nextWorkflowName);
+        }
+
+        boolean isRejected() {
+            return intValue == 0 && "R".equals(nextWorkflowName);
+        }
+
+        void negate() {
+            negate = true;
+            if (relation == '>') {
+                relation = '<';
+                intValue++;
+            } else {
+                relation = '>';
+                intValue--;
+            }
+        }
+
+
+        @Override
+        public String toString() {
+            return "Condition{" +
+                    part + relation + intValue +
+                    ", negate=" + negate +
+                    ", currentWorkflowName='" + currentWorkflowName + '\'' +
+                    ", nextWorkflowName='" + nextWorkflowName + '\'' +
+                    '}';
+        }
+
+        String name() {
+            return "" + part + relation + intValue;
+        }
+
+        public boolean isOnlyNextWorkflowName() {
+            return !isTerminator() && intValue == 0 && !nextWorkflowName.isEmpty() && currentWorkflowName == null;
+        }
+    }
+
+    private static class Node {
+        Condition condition;
+        String name;
+
+        final ArrayList<Condition> conditionsSoFar = new ArrayList<>();
+        Node trueNode;
+        Node falseNode;
+
+        Node(String name, Condition condition) {
+            this.condition = condition;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        boolean isA() {
+            return "A".equals(name) && condition == null;
+        }
+
+        boolean isR() {
+            return "R".equals(name) && condition == null;
+        }
+    }
+
+    int findPartNumber(char partName, ArrayList<Condition> conditions) {
+        final int MAX_VALUE = 4000;
+        List<Condition> parts = conditions.stream().filter(it -> it.part == partName).toList();
+        if (parts.isEmpty()) {
+            return MAX_VALUE;
+        } else {
+            switch (RelationType.valueOf(parts)) {
+                case GT -> {
+                    return MAX_VALUE - parts.stream().mapToInt(it -> it.intValue).max().getAsInt() - 1;
+                }
+                case LT -> {
+                    return parts.stream().mapToInt(it -> it.intValue).min().getAsInt() - 1;
+                }
+                case COMMON -> {
+                    int ltMin = parts.stream().filter(it -> it.relation == '<').mapToInt(it -> it.intValue).min().getAsInt() - 1;
+                    int gtMax = MAX_VALUE - parts.stream().filter(it -> it.relation == '>').mapToInt(it -> it.intValue).max().getAsInt() - 1;
+                    return ltMin - gtMax;
+                }
+                default -> {
+                    return 0;
+                }
+            }
+        }
+    }
+
+    enum RelationType {
+        GT, LT, COMMON, NONE;
+
+        static RelationType valueOf(List<Condition> conditions) {
+            List<Character> relations = conditions.stream().map(it -> it.relation).toList();
+            long count = relations.stream().distinct().count();
+            if (count == 1) {
+                if (relations.get(0) == '<') {
+                    return LT;
+                } else {
+                    return GT;
+                }
+            } else if (relations.contains('<') && relations.contains('>')) {
+                int ltMin = conditions.stream().filter(it -> it.relation == '<').mapToInt(it -> it.intValue).min().getAsInt();
+                int gtMax = conditions.stream().filter(it -> it.relation == '>').mapToInt(it -> it.intValue).max().getAsInt();
+                if (ltMin >= gtMax) {
+                    return COMMON;
+                }
+            }
+            return NONE;
+        }
     }
 }
