@@ -458,9 +458,16 @@ public class Dec19 extends DecBase {
                     return parts.stream().mapToInt(it -> it.intValue).min().getAsInt() - 1;
                 }
                 case COMMON -> {
-                    int ltMin = parts.stream().filter(it -> it.relation == '<').mapToInt(it -> it.intValue).min().getAsInt() - 1;
-                    int gtMax = MAX_VALUE - parts.stream().filter(it -> it.relation == '>').mapToInt(it -> it.intValue).max().getAsInt() - 1;
-                    return ltMin - gtMax;
+                    int ltMin = parts.stream().filter(it -> it.relation == '<')
+                            .mapToInt(it -> it.intValue)
+                            .min()
+                            .getAsInt() - 1;
+                    int gtMax = MAX_VALUE - 1 - parts.stream()
+                            .filter(it -> it.relation == '>')
+                            .mapToInt(it -> it.intValue)
+                            .max()
+                            .getAsInt();
+                    return ltMin - gtMax - 2;
                 }
                 default -> {
                     return 0;
