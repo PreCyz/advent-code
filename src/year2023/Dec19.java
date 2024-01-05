@@ -4,7 +4,16 @@ import base.DecBase;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Dec19 extends DecBase {
@@ -262,13 +271,78 @@ public class Dec19 extends DecBase {
         result.removeLast();
 
         long sum = 0;
+        Set<Integer> xes = new HashSet<>();
+        Set<Integer> mes = new HashSet<>();
+        Set<Integer> aes = new HashSet<>();
+        Set<Integer> ses = new HashSet<>();
         for (ArrayList<Condition> conditions : result) {
+            System.out.println(conditions.stream().map(Condition::name).collect(Collectors.joining(" ^ ")));
             long x = findPartNumber('x', conditions);
+            Set<Integer> range = findRangeByPartName('x', conditions);
+            System.out.printf("x=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
+            if (range.size() < 4000) {
+                xes.addAll(range);
+            }
+            //System.out.printf("x = %d ", x);
+
             long m = findPartNumber('m', conditions);
+            range = findRangeByPartName('m', conditions);
+            System.out.printf("m=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
+            if (range.size() < 4000) {
+                mes.addAll(range);
+            }
+            //System.out.printf("m = %d ", m);
+
             long s = findPartNumber('s', conditions);
+            range = findRangeByPartName('s', conditions);
+            System.out.printf("s=<%d,%d> ", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
+            if (range.size() < 4000) {
+                ses.addAll(range);
+            }
+            //System.out.printf("s = %d ", s);
+
             long a = findPartNumber('a', conditions);
+            range = findRangeByPartName('a', conditions);
+            System.out.printf("a=<%d,%d>%n", new LinkedList<>(range).getFirst(), new LinkedList<>(range).getLast());
+            if (range.size() < 4000) {
+                aes.addAll(range);
+            }
+            //System.out.printf("a = %d => possibilities %d%n", a, x * m * s * a);
+
             sum+= x * m * s * a;
+
+            LinkedList<Integer> X = new LinkedList<>(xes);
+            if (X.isEmpty()) {
+                System.out.print("x=0 ");
+            } else {
+                System.out.printf("X=<%d,%d> ", X.getFirst(), X.getLast());
+            }
+            LinkedList<Integer> M = new LinkedList<>(mes);
+            if (M.isEmpty()) {
+                System.out.print("m=0 ");
+            } else {
+                System.out.printf("m=<%d,%d> ", M.getFirst(), M.getLast());
+            }
+            LinkedList<Integer> S = new LinkedList<>(ses);
+            if (S.isEmpty()) {
+                System.out.print("s=0 ");
+            } else {
+                System.out.printf("s=<%d,%d> ", S.getFirst(), S.getLast());
+            }
+            LinkedList<Integer> A = new LinkedList<>(aes);
+            if (A.isEmpty()) {
+                System.out.print("a=0 ");
+            } else {
+                System.out.printf("a=<%d,%d>%n", A.getFirst(), A.getLast());
+            }
+
+            System.out.printf("X=[%d] ", X.size());
+            System.out.printf("M=[%d] ", M.size());
+            System.out.printf("S=[%d] ", S.size());
+            System.out.printf("A=[%d]%n%n", A.size());
+
         }
+        sum = (long) xes.size() * mes.size() * aes.size() * ses.size();
 
         System.out.printf("Part 2 - Total score %d%n", sum);
     }
@@ -297,7 +371,7 @@ public class Dec19 extends DecBase {
         if (workflow == null || workflow.conditions.isEmpty()) {
             return null;
         }
-        return workflow.conditions.remove(0);
+        return workflow.conditions.removeFirst();
     }
 
     private LinkedList<ArrayList<Condition>> result;
@@ -350,6 +424,72 @@ public class Dec19 extends DecBase {
         }
     }
 
+    int findPartNumber(char partName, ArrayList<Condition> conditions) {
+        final int MAX_VALUE = 4000;
+        List<Condition> conditionsByPart = conditions.stream().filter(it -> it.part == partName).toList();
+        if (conditionsByPart.isEmpty()) {
+            return MAX_VALUE;
+        } else {
+            switch (RelationType.valueOf(conditionsByPart)) {
+                case GT -> {
+                    return MAX_VALUE - conditionsByPart.stream().mapToInt(it -> it.intValue).max().getAsInt() - 1;
+                }
+                case LT -> {
+                    return conditionsByPart.stream().mapToInt(it -> it.intValue).min().getAsInt() - 1;
+                }
+                case COMMON -> {
+                    int ltMin = conditionsByPart.stream().filter(it -> it.relation == '<')
+                            .mapToInt(it -> it.intValue)
+                            .min()
+                            .getAsInt() - 1;
+                    int gtMax = conditionsByPart.stream()
+                            .filter(it -> it.relation == '>')
+                            .mapToInt(it -> it.intValue)
+                            .max()
+                            .getAsInt() - 1;
+                    return ltMin - gtMax;
+                }
+                default -> {
+                    return 0;
+                }
+            }
+        }
+    }
+
+    Set<Integer> findRangeByPartName(char partName, ArrayList<Condition> conditions) {
+        final int MAX_VALUE = 4000;
+        List<Condition> conditionsByPart = conditions.stream().filter(it -> it.part == partName).toList();
+        if (conditionsByPart.isEmpty()) {
+            return IntStream.range(1, MAX_VALUE + 1).boxed().collect(Collectors.toCollection(HashSet::new));
+        } else {
+            switch (RelationType.valueOf(conditionsByPart)) {
+                case GT -> {
+                    int rangeStart = conditionsByPart.stream().mapToInt(it -> it.intValue).max().getAsInt() + 1;
+                    return IntStream.range(rangeStart, MAX_VALUE + 1).boxed().collect(Collectors.toCollection(HashSet::new));
+                }
+                case LT -> {
+                    int rangeEnd = conditionsByPart.stream().mapToInt(it -> it.intValue).min().getAsInt();
+                    return IntStream.range(1, rangeEnd).boxed().collect(Collectors.toCollection(HashSet::new));
+                }
+                case COMMON -> {
+                    int ltMin = conditionsByPart.stream().filter(it -> it.relation == '<')
+                            .mapToInt(it -> it.intValue)
+                            .min()
+                            .getAsInt();
+                    int gtMax = conditionsByPart.stream()
+                            .filter(it -> it.relation == '>')
+                            .mapToInt(it -> it.intValue)
+                            .max()
+                            .getAsInt() - 1;
+                    return IntStream.range(gtMax, ltMin).boxed().collect(Collectors.toCollection(HashSet::new));
+                }
+                default -> {
+                    return new HashSet<>();
+                }
+            }
+        }
+    }
+
     private static class Condition {
         char part;
         char relation;
@@ -397,7 +537,6 @@ public class Dec19 extends DecBase {
             }
         }
 
-
         @Override
         public String toString() {
             return "Condition{" +
@@ -444,46 +583,14 @@ public class Dec19 extends DecBase {
         }
     }
 
-    int findPartNumber(char partName, ArrayList<Condition> conditions) {
-        final int MAX_VALUE = 4000;
-        List<Condition> parts = conditions.stream().filter(it -> it.part == partName).toList();
-        if (parts.isEmpty()) {
-            return MAX_VALUE;
-        } else {
-            switch (RelationType.valueOf(parts)) {
-                case GT -> {
-                    return MAX_VALUE - parts.stream().mapToInt(it -> it.intValue).max().getAsInt() - 1;
-                }
-                case LT -> {
-                    return parts.stream().mapToInt(it -> it.intValue).min().getAsInt() - 1;
-                }
-                case COMMON -> {
-                    int ltMin = parts.stream().filter(it -> it.relation == '<')
-                            .mapToInt(it -> it.intValue)
-                            .min()
-                            .getAsInt() - 1;
-                    int gtMax = MAX_VALUE - 1 - parts.stream()
-                            .filter(it -> it.relation == '>')
-                            .mapToInt(it -> it.intValue)
-                            .max()
-                            .getAsInt();
-                    return ltMin - gtMax - 2;
-                }
-                default -> {
-                    return 0;
-                }
-            }
-        }
-    }
-
     enum RelationType {
         GT, LT, COMMON, NONE;
 
         static RelationType valueOf(List<Condition> conditions) {
-            List<Character> relations = conditions.stream().map(it -> it.relation).toList();
+            LinkedList<Character> relations = new LinkedList<>(conditions.stream().map(it -> it.relation).toList());
             long count = relations.stream().distinct().count();
             if (count == 1) {
-                if (relations.get(0) == '<') {
+                if (relations.getFirst() == '<') {
                     return LT;
                 } else {
                     return GT;
