@@ -26,15 +26,15 @@ public class Main2023 {
 //                new Dec16(Utils.getFilePath(inputsDir, "dec_16.txt")),
 //                new Dec17(Utils.getFilePath(inputsDir, "dec_17.txt")),
 //                new Dec18(Utils.getFilePath(inputsDir, "dec_18.txt")),
-                new Dec19(2023)
-//                new Dec20(Utils.getFilePath(inputsDir, "dec_20.txt"))
+//                new Dec19(2023),
+                new Dec20(2023)
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_21.txt"))
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_22.txt"))
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_23.txt"))
 //                new Dec20(Utils.getFilePath(inputsDir, "dec_24.txt"))
         );
 
-        String cookieSession = "";
+        String cookieSession = args[0];
         DecBase.runTasks(adventTasks, cookieSession);
     }
 }
