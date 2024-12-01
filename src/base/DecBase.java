@@ -51,7 +51,7 @@ public abstract class DecBase implements Runnable {
     public void run() {
         System.out.printf("Calculating ... %s%n", this.getClass().getSimpleName());
         LocalDateTime start = LocalDateTime.now();
-        //calculatePart1();
+        calculatePart1();
         Duration duration = Duration.between(start, LocalDateTime.now());
         System.out.printf("Duration %s[m] %s[s]%n", duration.toMinutesPart(), duration.toSecondsPart());
 
@@ -75,7 +75,7 @@ public abstract class DecBase implements Runnable {
             try {
                 System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
                 System.out.printf("*******************************%n");
-                //task.readDefaultInput().run();
+                task.readDefaultInput().run();
                 task.downloadInput(cookieSession);
                 task.readInput().run();
                 System.out.printf("*******************************%n");
