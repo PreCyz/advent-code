@@ -8,7 +8,8 @@ public class Main2024 {
 
     public static void main(String[] args) {
         List<DecBase> adventTasks = List.of(
-                new Dec1(2024)
+//                new Dec1(2024),
+                new Dec2(2024)
         );
 
         String cookieSession = args[0];
