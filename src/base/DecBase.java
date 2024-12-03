@@ -4,10 +4,14 @@ import utils.Utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();
@@ -53,12 +57,14 @@ public abstract class DecBase implements Runnable {
         LocalDateTime start = LocalDateTime.now();
         calculatePart1();
         Duration duration = Duration.between(start, LocalDateTime.now());
-        System.out.printf("Duration %s[m] %s[s]%n", duration.toMinutesPart(), duration.toSecondsPart());
+        System.out.printf("Duration %d[m]:%d[s]:%d[mi]%n",
+                duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
+        );
 
         start = LocalDateTime.now();
         calculatePart2();
         duration = Duration.between(start, LocalDateTime.now());
-        System.out.printf("Duration %d[m]:%d[s]:%d[milli]%n",
+        System.out.printf("Duration %d[m]:%d[s]:%d[mi]%n",
                 duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
         );
     }
