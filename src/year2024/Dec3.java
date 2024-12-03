@@ -24,7 +24,6 @@ class Dec3 extends DecBase {
         return this;
     }
 
-
     @Override
     protected void calculatePart1() {
         String regex = "mul\\(\\d{1,3},\\d{1,3}\\)";
