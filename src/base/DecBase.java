@@ -62,15 +62,15 @@ public abstract class DecBase implements Runnable {
     private void printDuration(LocalDateTime start) {
         Duration duration = Duration.between(start, LocalDateTime.now());
         if (duration.toMinutes() > 0) {
-            System.out.printf("Duration %d[m]:%d[s]:%d[mi]%n",
+            System.out.printf("Duration %d[m]:%d[s]:%d[ms]%n",
                     duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
             );
         } else if (duration.toSeconds() > 0) {
-            System.out.printf("Duration %d[s]:%d[mi]%n", duration.toSecondsPart(), duration.toMillisPart());
+            System.out.printf("Duration %d[s]:%d[ms]%n", duration.toSecondsPart(), duration.toMillisPart());
         } else if (duration.toMillis() > 0) {
-            System.out.printf("Duration %d[mi]%n", duration.toMillisPart());
+            System.out.printf("Duration %d[ms]%n", duration.toMillisPart());
         } else {
-            System.out.printf("Duration %d[nano]%n", duration.toNanos());
+            System.out.printf("Duration %d[ns]%n", duration.toNanosPart());
         }
     }
 
