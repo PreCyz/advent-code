@@ -2,7 +2,11 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 class Dec2 extends DecBase {
@@ -25,9 +29,7 @@ class Dec2 extends DecBase {
         return this;
     }
 
-
     @Override
-
     protected void calculatePart1() {
         LinkedHashMap<Integer, List<Integer>> gradualReports = new LinkedHashMap<>();
         int idx = 0;
