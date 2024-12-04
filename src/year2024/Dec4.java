@@ -2,12 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec4 extends DecBase {
@@ -150,26 +145,30 @@ class Dec4 extends DecBase {
             }
         }
 
+        Map<Integer, List<Coordinates>> tmp = new HashMap<>(masMap);
         long sum = 0;
         for (Map.Entry<Integer, List<Coordinates>> entry : masMap.entrySet()) {
             Optional<Coordinates> A = entry.getValue().stream().filter(c -> c.letter == 'A').findFirst();
-            if (A.isPresent()) {
-                for (Map.Entry<Integer, List<Coordinates>> entry2 : masMap.entrySet()) {
-                    if (!entry2.getKey().equals(entry.getKey())) {
-                        Optional<Coordinates> any = entry2.getValue().stream()
-                                .filter(c -> c.letter == A.get().letter)
-                                .filter(c -> c.direction != A.get().direction)
-                                .filter(c -> c.X == A.get().X)
-                                .filter(c -> c.Y == A.get().Y)
-                                .findAny();
-                        if (any.isPresent()) {
-                            sum++;
-                        }
+            if (A.isPresent() && tmp.containsKey(entry.getKey())) {
+                tmp.remove(entry.getKey());
+                Optional<Integer> key = Optional.empty();
+                for (Map.Entry<Integer, List<Coordinates>> entry2 : tmp.entrySet()) {
+                    Optional<Coordinates> any = entry2.getValue().stream()
+                            .filter(c -> c.letter == A.get().letter)
+                            .filter(c -> c.direction != A.get().direction)
+                            .filter(c -> c.X == A.get().X)
+                            .filter(c -> c.Y == A.get().Y)
+                            .findAny();
+                    if (any.isPresent()) {
+                        sum++;
+                        key = Optional.of(entry2.getKey());
+                        break;
                     }
                 }
+                key.ifPresent(tmp::remove);
             }
         }
-        System.out.printf("Part 2 - Sum %d%n", sum / 2);
+        System.out.printf("Part 2 - Sum %d%n", sum);
     }
 
     private List<Coordinates> getMasForDirection(int x, int y, char[][] grid, Direction direction) {
