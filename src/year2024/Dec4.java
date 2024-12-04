@@ -172,9 +172,9 @@ class Dec4 extends DecBase {
     }
 
     private List<Coordinates> getMasForDirection(int x, int y, char[][] grid, Direction direction) {
-        Coordinates M = new Coordinates(x, y, 'M', direction);
         List<Coordinates> coordinates = new ArrayList<>(3);
-        Optional<Coordinates> A = findMasNextLetter(x, y, 'A', grid, direction);
+        Coordinates M = new Coordinates(x, y, 'M', direction);
+        Optional<Coordinates> A = findMasNextLetter(M.X, M.Y, 'A', grid, direction);
         if (A.isPresent()) {
             Optional<Coordinates> S = findMasNextLetter(A.get().X, A.get().Y, 'S', grid, direction);
             if (S.isPresent()) {
