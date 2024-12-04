@@ -153,15 +153,15 @@ class Dec4 extends DecBase {
                 tmp.remove(entry.getKey());
                 Optional<Integer> key = Optional.empty();
                 for (Map.Entry<Integer, List<Coordinates>> entry2 : tmp.entrySet()) {
-                    Optional<Coordinates> any = entry2.getValue().stream()
+                    Optional<Coordinates> sharedA = entry2.getValue().stream()
                             .filter(c -> c.letter == A.get().letter)
                             .filter(c -> c.direction != A.get().direction)
                             .filter(c -> c.X == A.get().X)
                             .filter(c -> c.Y == A.get().Y)
                             .findAny();
-                    if (any.isPresent()) {
-                        sum++;
+                    if (sharedA.isPresent()) {
                         key = Optional.of(entry2.getKey());
+                        sum++;
                         break;
                     }
                 }
