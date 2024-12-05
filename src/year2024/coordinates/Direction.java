@@ -1,4 +1,4 @@
-package utils;
+package year2024.coordinates;
 
 public enum Direction {
     UP(0, -1),
