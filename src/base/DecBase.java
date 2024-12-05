@@ -4,14 +4,10 @@ import utils.Utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();

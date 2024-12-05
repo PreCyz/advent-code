@@ -2,19 +2,11 @@ package utils;
 
 import year2023.dec19.Condition;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.net.http.*;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

@@ -2,11 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec2 extends DecBase {
