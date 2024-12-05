@@ -59,26 +59,20 @@ class Dec5 extends DecBase {
     protected void calculatePart1() {
         List<Integer[]> rules = new ArrayList<>(inputStrings.size());
         List<List<Integer>> updates = new ArrayList<>(inputStrings.size());
+        Map<Integer, Set<Integer>> allowedBeforeMap = new HashMap<>();
         for (String input : inputStrings) {
             if (!"".equals(input) && !"\n".equals(input) && !System.lineSeparator().equals(input)) {
                 if (input.contains(",")) {
-                    updates.add(Arrays.stream(input.split(",")).map(Integer::parseInt).toList());
+                    List<Integer> list = Arrays.stream(input.split(",")).map(Integer::parseInt).toList();
+                    updates.add(list);
+                    list.forEach(element -> allowedBeforeMap.putIfAbsent(element, new HashSet<>()));
                 } else {
                     rules.add(Arrays.stream(input.split("\\|")).map(Integer::parseInt).toArray(Integer[]::new));
                 }
             }
         }
 
-        Map<Integer, Set<Integer>> map = new HashMap<>();
-        for (List<Integer> update : updates) {
-            for (Integer element : update) {
-                if (!map.containsKey(element)) {
-                    map.put(element, new HashSet<>());
-                }
-            }
-        }
-
-        for (Map.Entry<Integer, Set<Integer>> entry : map.entrySet()) {
+        for (Map.Entry<Integer, Set<Integer>> entry : allowedBeforeMap.entrySet()) {
             final int number = entry.getKey();
             entry.setValue(rules.stream()
                     .filter(array -> array[1] == number)
@@ -92,7 +86,7 @@ class Dec5 extends DecBase {
             boolean correctUpdate = true;
             for (int i = update.size() - 1; i >= 0; i--) {
                 int number = update.get(i);
-                Set<Integer> allowedBefore = map.get(number);
+                Set<Integer> allowedBefore = allowedBeforeMap.get(number);
                 Integer[] allBefore = Arrays.copyOfRange(update.toArray(Integer[]::new), 0, i);
 
                 for (Integer before : allBefore) {
@@ -123,21 +117,15 @@ class Dec5 extends DecBase {
     protected void calculatePart2() {
         List<Integer[]> rules = new ArrayList<>(inputStrings.size());
         List<List<Integer>> updates = new ArrayList<>(inputStrings.size());
+        Map<Integer, Set<Integer>> allowedBeforeMap = new HashMap<>();
         for (String input : inputStrings) {
             if (!"".equals(input) && !"\n".equals(input) && !System.lineSeparator().equals(input)) {
                 if (input.contains(",")) {
-                    updates.add(Arrays.stream(input.split(",")).map(Integer::parseInt).toList());
+                    List<Integer> list = Arrays.stream(input.split(",")).map(Integer::parseInt).toList();
+                    updates.add(list);
+                    list.forEach(element -> allowedBeforeMap.putIfAbsent(element, new HashSet<>()));
                 } else {
                     rules.add(Arrays.stream(input.split("\\|")).map(Integer::parseInt).toArray(Integer[]::new));
-                }
-            }
-        }
-
-        Map<Integer, Set<Integer>> allowedBeforeMap = new HashMap<>();
-        for (List<Integer> update : updates) {
-            for (Integer element : update) {
-                if (!allowedBeforeMap.containsKey(element)) {
-                    allowedBeforeMap.put(element, new HashSet<>());
                 }
             }
         }
