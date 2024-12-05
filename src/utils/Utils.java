@@ -2,11 +2,19 @@ package utils;
 
 import year2023.dec19.Condition;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
-import java.net.http.*;
-import java.nio.file.*;
-import java.util.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,7 +64,7 @@ public final class Utils {
     }
 
     public static void main(String[] args) {
-        String[][] grid = new String [][] {
+        String[][] grid = new String[][]{
                 {"3", "1"},
                 {"4", "2"}
         };
@@ -144,7 +152,8 @@ public final class Utils {
         Path inputsPath = Paths.get("", "inputs", String.valueOf(year), "%d.txt".formatted(day));
 
         try (FileWriter fw = new FileWriter(inputsPath.toFile(), false);
-             BufferedWriter bw = new BufferedWriter(fw)){
+             BufferedWriter bw = new BufferedWriter(fw);
+             HttpClient httpClient = HttpClient.newHttpClient()) {
 
             String url = "https://adventofcode.com/%d/day/%d/input".formatted(year, day);
             HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(url))
@@ -152,8 +161,7 @@ public final class Utils {
                     .GET()
                     .build();
 
-            HttpResponse<Stream<String>> response = HttpClient.newHttpClient()
-                    .send(httpRequest, HttpResponse.BodyHandlers.ofLines());
+            HttpResponse<Stream<String>> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofLines());
 
             for (String line : response.body().toList()) {
                 bw.write(line);
