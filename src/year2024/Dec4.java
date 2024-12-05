@@ -1,6 +1,8 @@
 package year2024;
 
 import base.DecBase;
+import utils.Coordinate;
+import utils.Direction;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -27,26 +29,6 @@ class Dec4 extends DecBase {
                 "MXMXAXMASX"
         ).toList());
         return this;
-    }
-
-    private record Coordinate(int X, int Y, char letter, Direction direction) { }
-
-    enum Direction {
-        UP(0, -1),
-        DOWN(0, 1),
-        LEFT(-1, 0),
-        RIGHT(1, 0),
-        UP_RIGHT(1, -1),
-        DOWN_RIGHT(1, 1),
-        UP_LEFT(-1, -1),
-        DOWN_LEFT(-1, 1);
-        final int mvX;
-        final int mvY;
-
-        Direction(int mvX, int mvY) {
-            this.mvX = mvX;
-            this.mvY = mvY;
-        }
     }
 
     @Override
@@ -84,10 +66,10 @@ class Dec4 extends DecBase {
         List<Coordinate> ems = findNextLetter(x, y, 'M', grid, direction);
         if (!ems.isEmpty()) {
             for (Coordinate em : ems) {
-                List<Coordinate> as = findNextLetter(em.X, em.Y, 'A', grid, direction);
+                List<Coordinate> as = findNextLetter(em.X(), em.Y(), 'A', grid, direction);
                 if (!as.isEmpty()) {
                     for (Coordinate a : as) {
-                        List<Coordinate> ses = findNextLetter(a.X, a.Y, 'S', grid, direction);
+                        List<Coordinate> ses = findNextLetter(a.X(), a.Y(), 'S', grid, direction);
                         sum += ses.size();
                     }
                 }
@@ -98,12 +80,12 @@ class Dec4 extends DecBase {
 
     private List<Coordinate> findNextLetter(int startX, int startY, char nextLetter, char[][] grid, Direction direction) {
         List<Coordinate> coordinates = new ArrayList<>(4);
-        if (startY + direction.mvY >= 0 &&
-                startY + direction.mvY < grid.length &&
-                startX + direction.mvX >= 0 &&
-                startX + direction.mvX < grid[startY + direction.mvY].length &&
-                grid[startY + direction.mvY][startX + direction.mvX] == nextLetter) {
-            coordinates.add(new Coordinate(startX + direction.mvX, startY + direction.mvY, nextLetter, direction));
+        if (startY + direction.mvY() >= 0 &&
+                startY + direction.mvY() < grid.length &&
+                startX + direction.mvX() >= 0 &&
+                startX + direction.mvX() < grid[startY + direction.mvY()].length &&
+                grid[startY + direction.mvY()][startX + direction.mvX()] == nextLetter) {
+            coordinates.add(new Coordinate(startX + direction.mvX(), startY + direction.mvY(), nextLetter, direction));
         }
         return coordinates;
     }
@@ -148,17 +130,17 @@ class Dec4 extends DecBase {
         Map<Integer, List<Coordinate>> tmp = new HashMap<>(masMap);
         long sum = 0;
         for (Map.Entry<Integer, List<Coordinate>> entry : masMap.entrySet()) {
-            Optional<Coordinate> A = entry.getValue().stream().filter(c -> c.letter == 'A').findFirst();
+            Optional<Coordinate> A = entry.getValue().stream().filter(c -> c.letter() == 'A').findFirst();
             if (A.isPresent() && tmp.containsKey(entry.getKey())) {
                 tmp.remove(entry.getKey());
                 Optional<Integer> key = Optional.empty();
                 for (Map.Entry<Integer, List<Coordinate>> entry2 : tmp.entrySet()) {
                     Optional<Coordinate> sharedA = entry2.getValue()
                             .stream()
-                            .filter(c -> c.letter == A.get().letter)
-                            .filter(c -> c.direction != A.get().direction)
-                            .filter(c -> c.X == A.get().X)
-                            .filter(c -> c.Y == A.get().Y)
+                            .filter(c -> c.letter() == A.get().letter())
+                            .filter(c -> c.direction() != A.get().direction())
+                            .filter(c -> c.X() == A.get().X())
+                            .filter(c -> c.Y() == A.get().Y())
                             .findAny();
                     if (sharedA.isPresent()) {
                         key = Optional.of(entry2.getKey());
@@ -175,9 +157,9 @@ class Dec4 extends DecBase {
     private List<Coordinate> getMasForDirection(int x, int y, char[][] grid, Direction direction) {
         List<Coordinate> coordinates = new ArrayList<>(3);
         Coordinate M = new Coordinate(x, y, 'M', direction);
-        Optional<Coordinate> A = findMasNextLetter(M.X, M.Y, 'A', grid, direction);
+        Optional<Coordinate> A = findMasNextLetter(M.X(), M.Y(), 'A', grid, direction);
         if (A.isPresent()) {
-            Optional<Coordinate> S = findMasNextLetter(A.get().X, A.get().Y, 'S', grid, direction);
+            Optional<Coordinate> S = findMasNextLetter(A.get().X(), A.get().Y(), 'S', grid, direction);
             if (S.isPresent()) {
                 coordinates.add(M);
                 coordinates.add(A.get());
@@ -188,12 +170,12 @@ class Dec4 extends DecBase {
     }
 
     private Optional<Coordinate> findMasNextLetter(int startX, int startY, char nextLetter, char[][] grid, Direction direction) {
-        if (startY + direction.mvY >= 0 &&
-                startY + direction.mvY < grid.length &&
-                startX + direction.mvX >= 0 &&
-                startX + direction.mvX < grid[startY + direction.mvY].length &&
-                grid[startY + direction.mvY][startX + direction.mvX] == nextLetter) {
-            return Optional.of(new Coordinate(startX + direction.mvX, startY + direction.mvY, nextLetter, direction));
+        if (startY + direction.mvY() >= 0 &&
+                startY + direction.mvY() < grid.length &&
+                startX + direction.mvX() >= 0 &&
+                startX + direction.mvX() < grid[startY + direction.mvY()].length &&
+                grid[startY + direction.mvY()][startX + direction.mvX()] == nextLetter) {
+            return Optional.of(new Coordinate(startX + direction.mvX(), startY + direction.mvY(), nextLetter, direction));
         }
         return Optional.empty();
     }
