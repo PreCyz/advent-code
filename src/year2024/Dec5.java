@@ -54,14 +54,12 @@ class Dec5 extends DecBase {
         List<List<Integer>> updates = new ArrayList<>(inputStrings.size());
         Map<Integer, Set<Integer>> allowedBeforeMap = new HashMap<>();
         for (String input : inputStrings) {
-            if (!"".equals(input) && !"\n".equals(input) && !System.lineSeparator().equals(input)) {
-                if (input.contains(",")) {
-                    List<Integer> list = Arrays.stream(input.split(",")).map(Integer::parseInt).toList();
-                    updates.add(list);
-                    list.forEach(element -> allowedBeforeMap.putIfAbsent(element, new HashSet<>()));
-                } else {
-                    rules.add(Arrays.stream(input.split("\\|")).map(Integer::parseInt).toArray(Integer[]::new));
-                }
+            if (input.contains(",")) {
+                List<Integer> list = Arrays.stream(input.split(",")).map(Integer::parseInt).toList();
+                updates.add(list);
+                list.forEach(element -> allowedBeforeMap.putIfAbsent(element, new HashSet<>()));
+            } else if (input.contains("|")) {
+                rules.add(Arrays.stream(input.split("\\|")).map(Integer::parseInt).toArray(Integer[]::new));
             }
         }
 
