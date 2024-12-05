@@ -77,7 +77,7 @@ class Dec5 extends DecBase {
             entry.setValue(rules.stream()
                     .filter(array -> array[1] == number)
                     .map(array -> array[0])
-                    .collect(Collectors.toCollection(HashSet::new))
+                    .collect(Collectors.toSet())
             );
         }
 
@@ -129,7 +129,7 @@ class Dec5 extends DecBase {
             entry.setValue(rules.stream()
                     .filter(array -> array[1] == number)
                     .map(array -> array[0])
-                    .collect(Collectors.toCollection(HashSet::new))
+                    .collect(Collectors.toSet())
             );
         }
 
