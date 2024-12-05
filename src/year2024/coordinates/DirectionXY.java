@@ -1,6 +1,6 @@
 package year2024.coordinates;
 
-public enum Direction {
+public enum DirectionXY {
     UP(0, -1),
     DOWN(0, 1),
     LEFT(-1, 0),
@@ -12,7 +12,7 @@ public enum Direction {
     final int mvX;
     final int mvY;
 
-    Direction(int mvX, int mvY) {
+    DirectionXY(int mvX, int mvY) {
         this.mvX = mvX;
         this.mvY = mvY;
     }

@@ -1,7 +1,7 @@
 package year2024;
 
 import base.DecBase;
-import year2024.coordinates.Direction;
+import year2024.coordinates.DirectionXY;
 import year2024.coordinates.LetterCoordinate;
 
 import java.util.*;
@@ -47,21 +47,21 @@ class Dec4 extends DecBase {
             for (int x = 0; x < grid[0].length; x++) {
                 char X = grid[y][x];
                 if (X == 'X') {
-                    sum += getXmasForDirection(y, x, grid, Direction.UP);
-                    sum += getXmasForDirection(y, x, grid, Direction.UP_RIGHT);
-                    sum += getXmasForDirection(y, x, grid, Direction.UP_LEFT);
-                    sum += getXmasForDirection(y, x, grid, Direction.LEFT);
-                    sum += getXmasForDirection(y, x, grid, Direction.RIGHT);
-                    sum += getXmasForDirection(y, x, grid, Direction.DOWN);
-                    sum += getXmasForDirection(y, x, grid, Direction.DOWN_RIGHT);
-                    sum += getXmasForDirection(y, x, grid, Direction.DOWN_LEFT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.UP);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.UP_RIGHT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.UP_LEFT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.LEFT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.RIGHT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.DOWN);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.DOWN_RIGHT);
+                    sum += getXmasForDirection(y, x, grid, DirectionXY.DOWN_LEFT);
                 }
             }
         }
         System.out.printf("Part 1 - Sum %d%n", sum);
     }
 
-    private long getXmasForDirection(int y, int x, char[][] grid, Direction direction) {
+    private long getXmasForDirection(int y, int x, char[][] grid, DirectionXY direction) {
         long sum = 0;
         List<LetterCoordinate> ems = findNextLetter(x, y, 'M', grid, direction);
         if (!ems.isEmpty()) {
@@ -78,7 +78,7 @@ class Dec4 extends DecBase {
         return sum;
     }
 
-    private List<LetterCoordinate> findNextLetter(int startX, int startY, char nextLetter, char[][] grid, Direction direction) {
+    private List<LetterCoordinate> findNextLetter(int startX, int startY, char nextLetter, char[][] grid, DirectionXY direction) {
         List<LetterCoordinate> coordinates = new ArrayList<>(4);
         if (startY + direction.mvY() >= 0 &&
                 startY + direction.mvY() < grid.length &&
@@ -107,19 +107,19 @@ class Dec4 extends DecBase {
             for (int x = 0; x < grid[0].length; x++) {
                 char M = grid[y][x];
                 if (M == 'M') {
-                    List<LetterCoordinate> masForDirection = getMasForDirection(x, y, grid, Direction.UP_RIGHT);
+                    List<LetterCoordinate> masForDirection = getMasForDirection(x, y, grid, DirectionXY.UP_RIGHT);
                     if (!masForDirection.isEmpty()) {
                         masMap.put(idx++, masForDirection);
                     }
-                    masForDirection = getMasForDirection(x, y, grid, Direction.UP_LEFT);
+                    masForDirection = getMasForDirection(x, y, grid, DirectionXY.UP_LEFT);
                     if (!masForDirection.isEmpty()) {
                         masMap.put(idx++, masForDirection);
                     }
-                    masForDirection = getMasForDirection(x, y, grid, Direction.DOWN_RIGHT);
+                    masForDirection = getMasForDirection(x, y, grid, DirectionXY.DOWN_RIGHT);
                     if (!masForDirection.isEmpty()) {
                         masMap.put(idx++, masForDirection);
                     }
-                    masForDirection = getMasForDirection(x, y, grid, Direction.DOWN_LEFT);
+                    masForDirection = getMasForDirection(x, y, grid, DirectionXY.DOWN_LEFT);
                     if (!masForDirection.isEmpty()) {
                         masMap.put(idx++, masForDirection);
                     }
@@ -154,7 +154,7 @@ class Dec4 extends DecBase {
         System.out.printf("Part 2 - Sum %d%n", sum);
     }
 
-    private List<LetterCoordinate> getMasForDirection(int x, int y, char[][] grid, Direction direction) {
+    private List<LetterCoordinate> getMasForDirection(int x, int y, char[][] grid, DirectionXY direction) {
         List<LetterCoordinate> coordinates = new ArrayList<>(3);
         LetterCoordinate M = new LetterCoordinate(x, y, 'M', direction);
         Optional<LetterCoordinate> A = findMasNextLetter(M.X(), M.Y(), 'A', grid, direction);
@@ -169,7 +169,7 @@ class Dec4 extends DecBase {
         return coordinates;
     }
 
-    private Optional<LetterCoordinate> findMasNextLetter(int startX, int startY, char nextLetter, char[][] grid, Direction direction) {
+    private Optional<LetterCoordinate> findMasNextLetter(int startX, int startY, char nextLetter, char[][] grid, DirectionXY direction) {
         if (startY + direction.mvY() >= 0 &&
                 startY + direction.mvY() < grid.length &&
                 startX + direction.mvX() >= 0 &&
