@@ -85,18 +85,12 @@ class Dec5 extends DecBase {
         for (List<Integer> update : updates) {
             boolean correctUpdate = true;
             for (int i = update.size() - 1; i >= 0; i--) {
-                int number = update.get(i);
-                Set<Integer> allowedBefore = allowedBeforeMap.get(number);
-                Integer[] allBefore = Arrays.copyOfRange(update.toArray(Integer[]::new), 0, i);
+                int current = update.get(i);
+                Set<Integer> allowedBefore = allowedBeforeMap.get(current);
+                List<Integer> allBeforeCurrent = update.subList(0, i);
 
-                for (Integer before : allBefore) {
-                    if (!allowedBefore.contains(before)) {
-                        correctUpdate = false;
-                        break;
-                    }
-                }
-                if (!correctUpdate) {
-                    break;
+                if (!allowedBefore.containsAll(allBeforeCurrent)) {
+                    correctUpdate = false;
                 }
             }
             if (correctUpdate) {
@@ -143,17 +137,12 @@ class Dec5 extends DecBase {
         for (List<Integer> update : updates) {
             boolean correctUpdate = true;
             for (int i = update.size() - 1; i >= 0; i--) {
-                int number = update.get(i);
-                Set<Integer> allowedBefore = allowedBeforeMap.get(number);
-                Integer[] allBefore = Arrays.copyOfRange(update.toArray(Integer[]::new), 0, i);
+                int current = update.get(i);
+                Set<Integer> allowedBefore = allowedBeforeMap.get(current);
+                List<Integer> allBeforeCurrent = update.subList(0, i);
 
-                for (Integer before : allBefore) {
-                    if (!allowedBefore.contains(before)) {
-                        correctUpdate = false;
-                        break;
-                    }
-                }
-                if (!correctUpdate) {
+                if (!allowedBefore.containsAll(allBeforeCurrent)) {
+                    correctUpdate = false;
                     break;
                 }
             }
@@ -167,22 +156,22 @@ class Dec5 extends DecBase {
 
         int idx = 0;
         for (List<Integer> incorrectUpdate : incorrectUpdates) {
-            for (Integer number : incorrectUpdate) {
+            for (Integer current : incorrectUpdate) {
                 List<Integer> correctOrder = correctUpdates.get(idx);
                 if (correctOrder.isEmpty()) {
-                    correctOrder.add(number);
+                    correctOrder.add(current);
                 } else {
                     boolean addToEnd = true;
                     for (int i = 0, size = correctOrder.size(); i < size; i++) {
                         Integer existing = correctOrder.get(i);
-                        if (allowedBeforeMap.get(existing).contains(number)) {
-                            correctOrder.add(i, number);
+                        if (allowedBeforeMap.get(existing).contains(current)) {
+                            correctOrder.add(i, current);
                             addToEnd = false;
                             break;
                         }
                     }
                     if (addToEnd) {
-                        correctOrder.add(number);
+                        correctOrder.add(current);
                     }
                 }
             }
