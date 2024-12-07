@@ -18,7 +18,7 @@ class Dec7 extends DecBase {
             return switch (this) {
                 case add -> a + b;
                 case multiply -> a * b;
-                case concatenation -> Long.parseLong("" + a + b);
+                case concatenation -> Long.parseLong(a + "" + b);
             };
         }
     }
