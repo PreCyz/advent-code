@@ -2,11 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec7 extends DecBase {
@@ -27,8 +23,7 @@ class Dec7 extends DecBase {
         }
     }
 
-    record Equation(long result, List<Integer> numbers) {
-    }
+    record Equation(long result, List<Integer> numbers) { }
 
     @Override
     public Dec7 readDefaultInput() {
@@ -52,12 +47,14 @@ class Dec7 extends DecBase {
         ArrayList<Equation> equations = new ArrayList<>(inputStrings.size());
         for (String input : inputStrings) {
             String[] split = input.split(": ");
-            equations.add(new Equation(Long.parseLong(split[0]), new ArrayList<>(Stream.of(split[1].split(" ")).map(Integer::parseInt).toList())));
+            equations.add(new Equation(
+                    Long.parseLong(split[0]),
+                    new ArrayList<>(Stream.of(split[1].split(" ")).map(Integer::parseInt).toList())
+            ));
         }
 
         List<Long> totalCalibrationResults = new ArrayList<>();
         for (Equation equation : equations) {
-            double possibilities = Math.pow(2, equation.numbers().size() - 1);
             List<List<Operand>> newOperandList = getNewOperandList(equation.numbers().size() - 1);
 
             for (List<Operand> operands : newOperandList) {
@@ -73,25 +70,20 @@ class Dec7 extends DecBase {
                     break;
                 }
             }
-
         }
+
         System.out.printf("Part 1 - Sum %d%n", totalCalibrationResults.stream().mapToLong(i -> i).sum());
     }
 
     private List<List<Operand>> getNewOperandList(int size) {
         if (size == 1) {
-            List<Operand> add = new ArrayList<>(size);
-            add.add(Operand.add);
-            List<Operand> multiply = new ArrayList<>(size);
-            multiply.add(Operand.multiply);
-            return Stream.of(add, multiply).collect(Collectors.toList());
+            List<Operand> add = new ArrayList<>(List.of(Operand.add));
+            List<Operand> multiply = new ArrayList<>(List.of(Operand.multiply));
+            return new ArrayList<>(List.of(add, multiply));
         }
-        int firstHalfSize, secondHalfSize;
-        if (size % 2 == 0) {
-            firstHalfSize = size / 2;
-            secondHalfSize = size / 2;
-        } else {
-            firstHalfSize = size / 2;
+        int firstHalfSize = size / 2;
+        int secondHalfSize = size / 2;
+        if (size % 2 != 0) {
             secondHalfSize = 1 + size / 2;
         }
         List<List<Operand>> firstHalfOperandList = getNewOperandList(firstHalfSize);
@@ -112,7 +104,10 @@ class Dec7 extends DecBase {
         ArrayList<Equation> equations = new ArrayList<>(inputStrings.size());
         for (String input : inputStrings) {
             String[] split = input.split(": ");
-            equations.add(new Equation(Long.parseLong(split[0]), new ArrayList<>(Stream.of(split[1].split(" ")).map(Integer::parseInt).toList())));
+            equations.add(new Equation(
+                    Long.parseLong(split[0]),
+                    new ArrayList<>(Stream.of(split[1].split(" ")).map(Integer::parseInt).toList())
+            ));
         }
 
         List<Long> totalCalibrationResults = new ArrayList<>();
@@ -132,27 +127,20 @@ class Dec7 extends DecBase {
                     break;
                 }
             }
-
         }
         System.out.printf("Part 2 - Sum %d%n", totalCalibrationResults.stream().mapToLong(i -> i).sum());
     }
 
     private List<List<Operand>> getNewOperandList2(int size) {
         if (size == 1) {
-            List<Operand> add = new ArrayList<>(size);
-            add.add(Operand.add);
-            List<Operand> multiply = new ArrayList<>(size);
-            multiply.add(Operand.multiply);
-            List<Operand> concatenation = new ArrayList<>(size);
-            concatenation.add(Operand.concatenation);
-            return Stream.of(add, multiply, concatenation).collect(Collectors.toList());
+            List<Operand> add = new ArrayList<>(List.of(Operand.add));
+            List<Operand> multiply = new ArrayList<>(List.of(Operand.multiply));
+            List<Operand> concatenation = new ArrayList<>(List.of(Operand.concatenation));
+            return new ArrayList<>(List.of(add, multiply, concatenation));
         }
-        int firstHalfSize, secondHalfSize;
-        if (size % 2 == 0) {
-            firstHalfSize = size / 2;
-            secondHalfSize = size / 2;
-        } else {
-            firstHalfSize = size / 2;
+        int firstHalfSize = size / 2;
+        int secondHalfSize = size / 2;
+        if (size % 2 != 0) {
             secondHalfSize = 1 + size / 2;
         }
         List<List<Operand>> firstHalfOperandList = getNewOperandList2(firstHalfSize);
