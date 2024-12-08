@@ -129,29 +129,14 @@ class Dec8 extends DecBase {
             }
         }
 
-        Set<Point> antiNodePoints = new HashSet<>();
+        Set<Point> antiNodePoints = new HashSet<>(sameFrequencyPairs.stream().flatMap(Set::stream).toList());
         for (Set<Point> inlineAntenna : sameFrequencyPairs) {
             ArrayList<Point> pair = new ArrayList<>(inlineAntenna);
             antiNodePoints.addAll(findAntiNodePoints(pair.getFirst(), pair.getLast(), grid));
             antiNodePoints.addAll(findAntiNodePoints(pair.getLast(), pair.getFirst(), grid));
         }
 
-        long sum = 0;
-        for (Point antiNodePoint : antiNodePoints) {
-            char c = grid[antiNodePoint.y][antiNodePoint.x];
-            if (c == '.') {
-                grid[antiNodePoint.y][antiNodePoint.x] = '#';
-            }
-        }
-        for (y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[y].length; x++) {
-                if (grid[y][x] != '.') {
-                    sum++;
-                }
-            }
-        }
-
-        System.out.printf("Part 2 - Sum %d%n", sum);
+        System.out.printf("Part 2 - Sum %d%n", antiNodePoints.size());
     }
 
     Set<Point> findAntiNodePoints(Point main, Point second, char[][] grid) {
