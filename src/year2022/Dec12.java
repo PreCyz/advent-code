@@ -1,9 +1,12 @@
 package year2022;
 
 import base.DecBase;
-import utils.Utils;
+import utils.GridUtils;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -128,7 +131,7 @@ class Dec12 extends DecBase {
             }
         }
         visitedMap = new LinkedHashMap<>();
-        Utils.printGrid(GRID);
+        GridUtils.printGrid(GRID);
 
         Point startPoint = findPoint(GRID, START_LOCATION);
         Point endPoint = findPoint(GRID, END_LOCATION);

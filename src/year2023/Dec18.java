@@ -1,7 +1,7 @@
 package year2023;
 
 import base.DecBase;
-import utils.Utils;
+import utils.GridUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -167,10 +167,10 @@ public class Dec18 extends DecBase {
         Trench[][] dugOutGrid = createDugOutGrid(maxYD, maxYU, maxXR, maxXL, trenches);
 
         final char[][] grid = buildGrid(dugOutGrid);
-        Utils.writeToFile(grid);
+        GridUtils.writeToFile(grid);
 
         final char[][] finalDugout = createLavaDugout(grid);
-        Utils.writeToFile(finalDugout);
+        GridUtils.writeToFile(finalDugout);
 
         long sum = countTrench(finalDugout);
         System.out.printf("Part 1 - Total score %d%n", sum);
