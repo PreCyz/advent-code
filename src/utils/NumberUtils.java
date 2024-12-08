@@ -10,8 +10,6 @@ public final class NumberUtils {
     public static void main(String[] args) {
         System.out.println(lcm(10, 5, 3));
         System.out.println(gcd(10, 5, 3));
-//        System.out.println(leastCommonMultiple(new int[]{10, 5, 3}));
-//        System.out.println(leastCommonMultiple(Arrays.asList(1, 2, 3)));
     }
 
     private static int gcd(int x, int y) {
