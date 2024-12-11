@@ -2,9 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec11 extends DecBase {
@@ -13,13 +11,15 @@ class Dec11 extends DecBase {
         super(year, 11);
     }
 
+    record Pair(String stone, int blink) { }
+
+    final Map<Pair, Long> cache = new HashMap<>();
+
     @Override
     public Dec11 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(Stream.of(
-//                "0 1 10 99 999",
                 "125 17"
-//                ""
         ).toList());
         return this;
     }
@@ -33,7 +33,7 @@ class Dec11 extends DecBase {
             ArrayList<String> newStonesSetup = new ArrayList<>(stones.size());
             for (String stone : stones) {
                 if ("0".equals(stone)) {
-                    newStonesSetup.add(zeroBecomesOne(stone));
+                    newStonesSetup.add("1");
                 } else if (stone.length() % 2 == 0) {
                     String[] splitStones = splitInHalf(stone);
                     newStonesSetup.add(splitStones[0]);
@@ -47,10 +47,6 @@ class Dec11 extends DecBase {
         } while (blinks < numberOfBlinks);
 
         System.out.printf("Part 1 - Sum %d%n", stones.size());
-    }
-
-    String zeroBecomesOne(String zero) {
-        return "1";
     }
 
     String[] splitInHalf(String stone) {
@@ -68,37 +64,43 @@ class Dec11 extends DecBase {
 
     @Override
     protected void calculatePart2() {
-        ArrayList<String> stones = new ArrayList<>(Arrays.stream(inputStrings.getFirst().split(" ")).filter(s -> !s.isEmpty()).toList());
+        ArrayList<String> stones = new ArrayList<>(Arrays.stream(inputStrings.getFirst().split(" ")).toList());
         long sum = 0;
         for (String stone : stones) {
-            sum = blink(stone, 0, 0);
+            sum += blink(stone, 75);
         }
-        sum += stones.size();
         System.out.printf("Part 2 - Sum %d%n", sum);
     }
 
-    private long blink(String stone, long sum, int blink) {
-        if (blink == 75) {
-            return sum;
+    private long blink(String stone, int blink) {
+        Pair pair = new Pair(stone, blink);
+        if (cache.containsKey(pair)) {
+            return cache.get(pair);
         }
-        ArrayList<String> newStonesSetup = new ArrayList<>(2);
+        if (blink == 0) {
+            return 1;
+        }
         if ("0".equals(stone)) {
-            newStonesSetup.add(zeroBecomesOne(stone));
+            long result = blink("1", blink - 1);
+            cache.put(new Pair("1", blink - 1), result);
+            return result;
         } else if (stone.length() % 2 == 0) {
             String[] splitStones = splitInHalf(stone);
-            newStonesSetup.add(splitStones[0]);
-            newStonesSetup.add(splitStones[1]);
-        } else {
-            newStonesSetup.add(String.valueOf(Long.parseLong(stone) * 2024));
-        }
-        sum += newStonesSetup.size();
 
-        for (String newStone : newStonesSetup) {
-            System.out.printf("blink %d, stone %s, sum: %d%n", blink + 1, newStone, sum);
-            sum = blink(newStone, sum, blink + 1);
+            long r1 = blink(splitStones[0], blink - 1);
+            cache.put(new Pair(splitStones[0], blink - 1), r1);
+
+            long r2 = blink(splitStones[1], blink - 1);
+            cache.put(new Pair(splitStones[1], blink - 1), r2);
+
+            return r1 + r2;
         }
-        return sum;
+
+        String sTmp = String.valueOf(Long.parseLong(stone) * 2024);
+        long result = blink(sTmp, blink - 1);
+        cache.put(new Pair(sTmp, blink - 1), result);
+
+        return result;
     }
-
 
 }
