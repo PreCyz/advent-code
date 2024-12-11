@@ -71,7 +71,7 @@ class Dec11 extends DecBase {
         ArrayList<String> stones = new ArrayList<>(Arrays.stream(inputStrings.getFirst().split(" ")).filter(s -> !s.isEmpty()).toList());
         long sum = 0;
         for (String stone : stones) {
-            blink(stone, sum, 0);
+            sum = blink(stone, 0, 0);
         }
         sum += stones.size();
         System.out.printf("Part 2 - Sum %d%n", sum);
@@ -94,7 +94,8 @@ class Dec11 extends DecBase {
         sum += newStonesSetup.size();
 
         for (String newStone : newStonesSetup) {
-            sum += blink(newStone, sum, blink + 1);
+            System.out.printf("blink %d, stone %s, sum: %d%n", blink + 1, newStone, sum);
+            sum = blink(newStone, sum, blink + 1);
         }
         return sum;
     }
