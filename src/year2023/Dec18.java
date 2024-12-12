@@ -140,15 +140,15 @@ public class Dec18 extends DecBase {
         long A = 0;
         for (int i = 0; i < points.size(); i++) {
             Point pi = points.get(i);
-            Point pi1 = pi;
+            Point p_i1 = pi;
             if (i - 1 >= 0) {
-                pi1 = points.get(i - 1);
+                p_i1 = points.get(i - 1);
             }
-            Point pi2 = pi;
+            Point p_i2 = pi;
             if (i + 1 < points.size()) {
-                pi2 = points.get(i + 1);
+                p_i2 = points.get(i + 1);
             }
-            A += pi.x * (pi2.y - pi1.y);
+            A += pi.x * (p_i2.y - p_i1.y);
         }
         A = Math.abs(A) / 2;
 
