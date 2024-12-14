@@ -2,10 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 class Dec13 extends DecBase {
@@ -127,27 +124,27 @@ class Dec13 extends DecBase {
 
         long sum = 0;
         for (MachineLong machine : machines) {
-            //sum += getLowestMachineScore2(machine, 10_000_000);
-            sum += getLowestMachineScore2(machine, 1);
+            sum += getLowestMachineScore2(machine);
         }
 
         System.out.printf("Part 2 - Sum %d%n", sum);
     }
 
-    private long getLowestMachineScore2(MachineLong machine, int rounds) {
-        List<Result> xResults = new ArrayList<>();
-        for (int a = 1; a <= rounds; a++) {
-            //a * machine.xA + b * machine.xB == machine.prizeX
-            double b = (machine.prizeX - a * machine.xA)/ machine.xB;
+    private long getLowestMachineScore2(MachineLong machine) {
+        //i * ax + j * bx = px /*by => i * ax * by + j * bx * by = px * by
+        //i * ay + j * by = py /*bx => i * ay * bx + j * bx * by = py * bx
+        //i * ax * by - px * by == i * ay * bx - py * bx =>
+        //i = (px * by - py * bx) / (ax * by - ay * bx)
+        //j = (px - i * ax) / bx
 
-            if (a * machine.yA + b * machine.yB == machine.prizeY) {
-                xResults.add(new Result(a, Double.valueOf(b).intValue()));
-            }
+        double i = (double) (machine.prizeX * machine.yB - machine.prizeY * machine.xB) / (machine.xA * machine.yB - machine.yA * machine.xB);
+        double j = (machine.prizeX - i * machine.xA) / machine.xB;
+        if (i % 1 == 0 && j % 1 == 0) {
+            System.out.println("Button A =" + i + " Button B =" + j);
+            return (long) (i * 3 + j);
         }
-        if (xResults.isEmpty()) {
-            return 0;
-        }
-        return xResults.stream().mapToInt(r -> r.a * 3 + r.b).min().getAsInt();
+
+        return 0;
     }
 
 }
