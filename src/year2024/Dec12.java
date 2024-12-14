@@ -57,7 +57,12 @@ class Dec12 extends DecBase {
     public Dec12 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(Stream.of(
-                "RRRRIICCFF",
+                "AAAA",
+                "BBCD",
+                "BBCC",
+                "EEEC"
+
+                /*"RRRRIICCFF",
                 "RRRRIICCCF",
                 "VVRRRCCFFF",
                 "VVRCCCJFFF",
@@ -66,7 +71,7 @@ class Dec12 extends DecBase {
                 "VVIIICJJEE",
                 "MIIIIIJJEE",
                 "MIIISIJEEE",
-                "MMMISSJEEE"
+                "MMMISSJEEE"*/
         ).toList());
         return this;
     }
@@ -189,5 +194,17 @@ class Dec12 extends DecBase {
         }
         System.out.printf("Part 2 - Sum %d%n", sum);
     }
+
+    /*int calculateSides(Set<Point> pointSet) {
+        long distinctX = pointSet.stream().mapToInt(p -> p.x).distinct().count();
+        long distinctY = pointSet.stream().mapToInt(p -> p.y).distinct().count();
+        if (distinctX - distinctY == 0) {
+            return 4;
+        } else if (distinctY - distinctX != 0) {
+            //x = 2, y = 3 2^3
+            //x = 5, y = 5
+        }
+
+    }*/
 
 }
