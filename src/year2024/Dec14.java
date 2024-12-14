@@ -1,6 +1,7 @@
 package year2024;
 
 import base.DecBase;
+import utils.GridUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -103,48 +104,87 @@ class Dec14 extends DecBase {
             ));
         }
 
-        int seconds = 100_000;
+        int seconds = 100_000_000;
         final int spaceX = 101;
         final int spaceY = 103;
 //        final int spaceX = 11;
 //        final int spaceY = 7;
 
         int move = 0;
-        boolean easterEg = false;
-        ArrayList<Robot> newPositions = new ArrayList<>(robots.size());
-
+        boolean lookForEasterEgg = true;
         do {
+            ArrayList<Robot> newPositions = new ArrayList<>(robots.size());
+            move++;
             for (Robot robot : robots) {
                 newPositions.add(move(robot, spaceX, spaceY));
             }
             robots = new ArrayList<>(newPositions);
-            newPositions.clear();
-            move++;
-            easterEg = isEasterEgg(robots, spaceX, spaceY);
-        } while (move < seconds || easterEg);
-        System.out.printf("Part 2 - Sum[%b] %d%n", easterEg, move);
+            isChristmasTree(robots, spaceX, spaceY);
+            if (isChristmasTree(robots, spaceX, spaceY)) {
+                lookForEasterEgg = false;
+            }
+            if (move % 100 == 0) {
+                System.out.printf("%d%n", move);
+            }
+
+            /*Set<Point> uniquePositions = robots.stream().map(Robot::p).collect(Collectors.toSet());
+            if (uniquePositions.size() == robots.size()) {
+                buildAndPrintGrid(robots, spaceX, spaceY);
+                lookForEasterEgg = false;
+            }*/
+        } while (lookForEasterEgg);
+
+        System.out.printf("Part 2 - Sum[%b] %d%n", move, move);
     }
 
-    boolean isEasterEgg(ArrayList<Robot> robots, int spaceX, int spaceY) {
-        long count = robots.stream().filter(r -> r.p.x == spaceX / 2 && r.p.y == 0).count();
-        if (count > 1) {
+    /*
+
+    *
+   ***
+  *****
+ *******
+*********
+
+    * */
+
+
+    boolean isChristmasTree(ArrayList<Robot> robots, int spaceX, int spaceY) {
+        final int density = 5;
+        for (Robot robot : robots) {
+
             boolean isEasterEgg = true;
-            for (int y = 1; y < spaceY; y++) {
-                if (spaceX / 2 - y >= 0) {
-                    final int yy = y;
-                    long r1 = robots.stream().filter(r -> r.p.x == (spaceX / 2) - yy && r.p.y == yy).count();
-                    long r2 = robots.stream().filter(r -> r.p.x == (spaceX / 2) + yy && r.p.y == yy).count();
-                    isEasterEgg = r1 > 0 && r2 > 0;
-                    if (!isEasterEgg) {
-                        return false;
+            for (int y = robot.p.y; y < robot.p.y + density; y++) {
+                for (int i = 0; i < density; i++) {
+                    for (int x = robot.p.x - i; x <= robot.p.x + i; x++) {
+                        final int xx = x;
+                        final int yy = y;
+                        long number = robots.stream().filter(r -> r.p.y == yy && r.p.x == xx).count();
+                        isEasterEgg &= number != 0;
                     }
-                } else {
+                }
+
+                if (!isEasterEgg) {
                     break;
                 }
             }
-            return isEasterEgg;
+            if (isEasterEgg) {
+                buildAndPrintGrid(robots, spaceX, spaceY);
+                return true;
+            }
         }
         return false;
+    }
+
+    private void buildAndPrintGrid(ArrayList<Robot> robots, int spaceX, int spaceY) {
+        char[][] grid = new char[spaceY][spaceX];
+        for (int y = 0; y < spaceY; y++) {
+            for (int x = 0; x < spaceX; x++) {
+                grid[y][x] = '.';
+            }
+        }
+        robots.forEach(robot -> grid[robot.p.y][robot.p.x] = '#');
+        GridUtils.printGridYFirst(grid);
+        System.out.println();
     }
 
 }
