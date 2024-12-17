@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 class Dec17 extends DecBase {
 
-    static String OUTPUT = "";
 
     public Dec17(int year) {
         super(year, 17);
@@ -18,7 +17,16 @@ class Dec17 extends DecBase {
         String B;
         String C;
         int instructionPointer;
-        int programLength;
+        String output;
+
+        public Register() {
+            instructionPointer = 0;
+            output = "";
+        }
+
+        String output() {
+            return output.substring(0, output.length() - 1);
+        }
     }
 
     static class ComboOperand {
@@ -97,7 +105,7 @@ class Dec17 extends DecBase {
         out {
             @Override
             void execute(Register register, ComboOperand comboOperand) {
-                OUTPUT += Integer.parseInt(comboOperand.getOperand()) % 8 + ",";
+                register.output += Integer.parseInt(comboOperand.getOperand()) % 8 + ",";
                 register.instructionPointer += 2;
             }
         },
@@ -154,10 +162,8 @@ class Dec17 extends DecBase {
 
     @Override
     protected void calculatePart1() {
-        OUTPUT = "";
         Register register = new Register();
         String[] program = new String[]{};
-        register.instructionPointer = 0;
         for (String input : inputStrings) {
             if (input.startsWith("Register A: ")) {
                 register.A = input.replace("Register A: ", "");
@@ -167,7 +173,6 @@ class Dec17 extends DecBase {
                 register.C = input.replace("Register C: ", "");
             } else if (input.startsWith("Program: ")) {
                 program = input.replace("Program: ", "").split(",");
-                register.programLength = program.length;
             }
         }
 
@@ -177,7 +182,7 @@ class Dec17 extends DecBase {
             ins.execute(register, operand);
         } while(register.instructionPointer < program.length);
 
-        System.out.printf("Part 1 - Sum %s%n", OUTPUT.substring(0, OUTPUT.length() - 1));
+        System.out.printf("Part 1 - Sum %s%n", register.output());
     }
 
     @Override
