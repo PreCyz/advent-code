@@ -1,9 +1,9 @@
 package year2024;
 
 import base.DecBase;
+import utils.GridUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Dec16 extends DecBase {
@@ -12,11 +12,20 @@ class Dec16 extends DecBase {
         super(year, 16);
     }
 
+    record Point(int x, int y, char value, Direction direction) {
+        public String toString2() {
+            return "Point{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
+    }
+
     @Override
     public Dec16 readDefaultInput() {
         System.out.println("Reading default input.");
         inputStrings = new LinkedList<>(Stream.of(
-                "###############",
+                /*"###############",
                 "#.......#....E#",
                 "#.#.###.#.###.#",
                 "#.....#.#...#.#",
@@ -30,178 +39,257 @@ class Dec16 extends DecBase {
                 "#.....#...#.#.#",
                 "#.###.#.#.#.#.#",
                 "#S..#.....#...#",
-                "###############"
+                "###############"*/
+                "#################",
+                "#...#...#...#..E#",
+                "#.#.#.#.#.#.#.#.#",
+                "#.#.#.#...#...#.#",
+                "#.#.#.#.###.#.#.#",
+                "#...#.#.#.....#.#",
+                "#.#.#.#.#.#####.#",
+                "#.#...#.#.#.....#",
+                "#.#.#####.#.###.#",
+                "#.#.#.......#...#",
+                "#.#.###.#####.###",
+                "#.#.#...#.....#.#",
+                "#.#.#.#####.###.#",
+                "#.#.#.........#.#",
+                "#.#.#.#########.#",
+                "#S#.............#",
+                "#################"
         ).toList());
         return this;
     }
 
-    static class Point {
-        int x;
-        int y;
-        char value;
-        boolean rotated;
-        boolean visited;
-        Direction direction;
-
-        static Point valueOf(Point point) {
-            return new Point(point.x, point.y, point.value);
-        }
-
-        public Point(int x, int y, char value) {
-            this.x = x;
-            this.y = y;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", value=" + value +
-                    ", rotated=" + rotated +
-                    ", visited=" + visited +
-                    ", direction=" + direction +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Point point = (Point) o;
-            return x == point.x && y == point.y && value == point.value && rotated == point.rotated && visited == point.visited && direction == point.direction;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = x;
-            result = 31 * result + y;
-            result = 31 * result + value;
-            result = 31 * result + Boolean.hashCode(rotated);
-            result = 31 * result + Boolean.hashCode(visited);
-            return result;
-        }
-    }
-
     enum Direction {
-        UP(0, -1),
-        DOWN(0, 1),
-        LEFT(-1, 0),
-        RIGHT(1, 0);
+        UP(0, -1, '^'),
+        DOWN(0, 1, 'v'),
+        LEFT(-1, 0, '<'),
+        RIGHT(1, 0, '>');
 
         final int mvX;
         final int mvY;
+        final char c;
 
-        Direction(int mvX, int mvY) {
+        Direction(int mvX, int mvY, char c) {
             this.mvX = mvX;
             this.mvY = mvY;
+            this.c = c;
         }
     }
 
     @Override
     protected void calculatePart1() {
-        ArrayList<Point> maze = new ArrayList<>(inputStrings.getFirst().length() * inputStrings.size());
+        Node startNode = null, endNode = null;
+        List<List<Node>> maze = new ArrayList<>(inputStrings.size());
         int y = 0;
+        int nodeNumber = 0;
         char[][] grid = new char[inputStrings.size()][inputStrings.getFirst().length()];
         for (String input : inputStrings) {
+            ArrayList<Node> row = new ArrayList<>(input.length());
             char[] charArray = input.toCharArray();
             for (int x = 0; x < input.length(); x++) {
-                Point point = new Point(x, y, charArray[x]);
-                if (charArray[x] == 'S') {
-                    point.direction = Direction.RIGHT;
+                Point point = new Point(x, y, charArray[x], null);
+                Node node = new Node(nodeNumber, 1, point);
+                if (charArray[x] == '#') {
+                    node = new Node(nodeNumber, 0, point);
                 }
-                maze.add(point);
+                row.add(node);
+
+                if (charArray[x] == 'S') {
+                    startNode = new Node(nodeNumber, 1, new Point(x, y, charArray[x], Direction.LEFT));
+                }
+                if (charArray[x] == 'E') {
+                    endNode = new Node(nodeNumber, 1, point);
+                }
+                nodeNumber++;
                 grid[y][x] = charArray[x];
             }
             y++;
+            maze.add(row);
         }
-        maze.trimToSize();
 
-        Point startPoint = maze.stream().filter(p -> p.value == 'S').findFirst().get();
+        Dijkstra dijkstra = new Dijkstra(inputStrings.size() * inputStrings.getFirst().length());
+        dijkstra.dijkstra(maze, startNode, endNode);
+        int distance = dijkstra.getDistance(endNode);
+//        dijkstra.printPath(endNode.number, grid);
+        GridUtils.writeToFile(grid);
 
-        List<Set<Point>> allPaths = new ArrayList<>(findPath(startPoint, maze));
         long sum = 0;
-        System.out.printf("Part 1 - Sum %d%n", sum);
-    }
-
-    private List<LinkedHashSet<Point>> findPath(Point startPoint, ArrayList<Point> maze) {
-        List<LinkedHashSet<Point>> result = new ArrayList<>();
-        Set<Point> nextPoints = findNextPoints(startPoint, maze);
-
-        List<Point> end = nextPoints.stream().filter(point -> point.value == 'E').toList();
-        if (!end.isEmpty()) {
-            result.add(new LinkedHashSet<>(end));
-        }
-        List<Point> rest = nextPoints.stream().filter(point -> point.value != 'E').toList();
-
-        for (Point nextPoint : rest) {
-            maze.stream().filter(p -> startPoint.x == p.x && startPoint.y == p.y).forEach(p -> p.visited = true);
-
-            Point start = Point.valueOf(startPoint);
-            start.visited = true;
-
-            List<LinkedHashSet<Point>> paths = findPath(nextPoint, maze);
-            for (LinkedHashSet<Point> path : paths) {
-                path.addFirst(nextPoint);
-                if (nextPoint.direction != start.direction) {
-                    start.rotated = true;
-                    path.addFirst(start);
-                }
-            }
-            result.addAll(paths);
-        }
-        return result;
-    }
-
-    private Set<Point> findNextPoints(final Point startPoint, final ArrayList<Point> maze) {
-        Set<Point> points = new HashSet<>();
-        maze.stream()
-                .filter(p -> p.x == startPoint.x + Direction.RIGHT.mvX)
-                .filter(p -> p.y == startPoint.y)
-                .filter(p -> p.value != '#')
-                .filter(p -> !p.visited)
-                .findFirst()
-                .ifPresent( p -> {
-                    p.direction = Direction.RIGHT;
-                    points.add(p);
-                });
-        maze.stream()
-                .filter(p -> p.x == startPoint.x + Direction.LEFT.mvX)
-                .filter(p -> p.y == startPoint.y)
-                .filter(p -> p.value != '#')
-                .filter(p -> !p.visited)
-                .findFirst()
-                .ifPresent( p -> {
-                    p.direction = Direction.LEFT;
-                    points.add(p);
-                });
-        maze.stream()
-                .filter(p -> p.y == startPoint.y + Direction.UP.mvY)
-                .filter(p -> p.x == startPoint.x)
-                .filter(p -> p.value != '#')
-                .filter(p -> !p.visited)
-                .findFirst()
-                .ifPresent( p -> {
-                    p.direction = Direction.UP;
-                    points.add(p);
-                });
-        maze.stream()
-                .filter(p -> p.y == startPoint.y + Direction.DOWN.mvY)
-                .filter(p -> p.x == startPoint.x)
-                .filter(p -> p.value != '#')
-                .filter(p -> !p.visited)
-                .findFirst()
-                .ifPresent( p -> {
-                    p.direction = Direction.DOWN;
-                    points.add(p);
-                });
-        return points.stream().filter(p -> !(p.x == startPoint.x && p.y == startPoint.y)).collect(Collectors.toSet());
+//        107476
+//        106476
+        System.out.printf("Part 1 - Sum %d%n", distance);
     }
 
     @Override
     protected void calculatePart2() {
 
 //        System.out.printf("Part 2 - Sum[%b] %d%n", move, move);
+    }
+
+    static class Node implements Comparator<Node> {
+
+        int number;
+        int price;
+        Point point;
+
+        Node(int number, int price, Point point) {
+            this.number = number;
+            this.price = price;
+            this.point = point;
+        }
+
+        @Override
+        public int compare(Node n1, Node n2) {
+            return Integer.compare(n1.price, n2.price);
+        }
+
+        static Comparator<Node> COMPARATOR = Comparator.comparingInt(o -> o.price);
+
+        @Override
+        public String toString() {
+            return "Node{number=" + number + ", price=" + price + ", point=" + point + '}';
+        }
+    }
+
+    static class Dijkstra {
+
+        private static final int NO_PARENT = -1;
+
+        private final int[] distance;
+        private final Set<Integer> visited;
+        private final PriorityQueue<Node> pQue;
+
+        private final int totalNodes;
+        List<List<Node>> adjacent;
+        int[] parents;
+
+        public Dijkstra(int totalNodes) {
+            this.totalNodes = totalNodes;
+            distance = new int[totalNodes];
+            visited = new HashSet<>();
+            pQue = new PriorityQueue<>(totalNodes, Node.COMPARATOR);
+            parents = new int[totalNodes];
+        }
+
+        public void dijkstra(List<List<Node>> adjacent, Node startNode, Node endNode) {
+            this.adjacent = adjacent;
+
+            for (int j = 0; j < totalNodes; j++) {
+                distance[j] = Integer.MAX_VALUE;
+            }
+
+            pQue.add(startNode);
+            distance[startNode.number] = 0;
+            parents[startNode.number] = NO_PARENT;
+
+            while (visited.size() != totalNodes) {
+                if (pQue.isEmpty()) {
+                    return;
+                }
+                Node ux = pQue.remove();
+                if (visited.contains(ux.number)) {
+                    continue;
+                }
+                visited.add(ux.number);
+                eNeighbours(ux);
+                if (visited.contains(endNode.number)) {
+                    break;
+                }
+            }
+        }
+
+        private void eNeighbours(Node ux) {
+            int edgeDist = -1;
+            int newDist = -1;
+
+            // All neighbors of vx
+            for (Node vx : findNeighbours(ux)) {
+                // If the current node hasn't been already processed
+                if (!visited.contains(vx.number)) {
+                    edgeDist = vx.price;
+                    newDist = distance[ux.number] + edgeDist;
+
+                    // If the new distance is lesser in the cost
+                    if (newDist < distance[vx.number]) {
+                        distance[vx.number] = newDist;
+                        parents[vx.number] = ux.number;
+                        /*System.out.printf("%d(%d,%d) -> %d(%d,%d) [%d]%n",
+                                ux.number, ux.point.x, ux.point.y,
+                                vx.number, vx.point.x, vx.point.y, newDist);*/
+                    }
+
+                    // Adding the current node to the priority queue pQue
+                    pQue.add(new Node(vx.number, distance[vx.number], vx.point));
+                }
+            }
+        }
+
+        private ArrayList<Node> findNeighbours(Node ux) {
+            ArrayList<Node> neighbours = new ArrayList<>(3);
+
+            int newX;
+            int newY;
+            switch (ux.point.direction) {
+                case UP -> {
+                    neighbours.addAll(checkDirection(ux, Direction.UP, 0));
+                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 1000));
+                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 1000));
+                }
+                case DOWN -> {
+                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 0));
+                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 1000));
+                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 1000));
+                }
+                case LEFT -> {
+                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 0));
+                    neighbours.addAll(checkDirection(ux, Direction.UP, 1000));
+                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 1000));
+                }
+                case RIGHT -> {
+                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 0));
+                    neighbours.addAll(checkDirection(ux, Direction.UP, 1000));
+                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 1000));
+                }
+            }
+            neighbours.trimToSize();
+            return neighbours;
+        }
+
+        void printPath(int startVertex, char[][] grid) {
+            if (startVertex == NO_PARENT || parents[startVertex] == Integer.MAX_VALUE) {
+                return;
+            }
+            printPath(parents[startVertex], grid);
+            adjacent.stream()
+                    .flatMap(List::stream)
+                    .filter(n -> n.number == startVertex)
+                    .findFirst()
+                    .ifPresent(n -> grid[n.point.y][n.point.x] = '0');
+        }
+
+        private List<Node> checkDirection(Node ux, Direction direction, final int additionalCost) {
+            int newX;
+            int newY;
+            newX = ux.point.x + direction.mvX;
+            newY = ux.point.y + direction.mvY;
+            return adjacent.stream()
+                    .flatMap(List::stream)
+                    .filter(n -> n.point.x == newX)
+                    .filter(n -> n.point.y == newY)
+                    .filter(n -> n.point.value != '#')
+                    .map(n -> new Node(n.number, n.price + additionalCost, new Point(newX, newY, n.point.value, direction)))
+                    .toList();
+        }
+
+        public void print(int startNodeNumber) {
+            for (int j = 0; j < distance.length; j++) {
+                System.out.printf("%d to %d is %d%n", startNodeNumber, j, distance[j]);
+            }
+        }
+
+        public int getDistance(Node destinationNode) {
+            return distance[destinationNode.number];
+        }
     }
 }

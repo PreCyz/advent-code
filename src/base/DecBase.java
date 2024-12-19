@@ -88,7 +88,7 @@ public abstract class DecBase implements Runnable {
             try {
                 System.out.printf("%nStarting new task %s%n", task.getClass().getSimpleName());
                 System.out.printf("*******************************%n");
-//                task.readDefaultInput().run();
+                task.readDefaultInput().run();
                 task.downloadInput(cookieSession);
                 task.readInput().run();
                 System.out.printf("*******************************%n");
