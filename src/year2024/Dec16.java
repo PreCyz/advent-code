@@ -90,17 +90,17 @@ class Dec16 extends DecBase {
             char[] charArray = input.toCharArray();
             for (int x = 0; x < input.length(); x++) {
                 Point point = new Point(x, y, charArray[x], null);
-                Node node = new Node(nodeNumber, 1, point);
+                Node node = new Node(nodeNumber, 0, point);
                 if (charArray[x] == '#') {
                     node = new Node(nodeNumber, 0, point);
                 }
                 row.add(node);
 
                 if (charArray[x] == 'S') {
-                    startNode = new Node(nodeNumber, 1, new Point(x, y, charArray[x], Direction.LEFT));
+                    startNode = new Node(nodeNumber, 0, new Point(x, y, charArray[x], Direction.LEFT));
                 }
                 if (charArray[x] == 'E') {
-                    endNode = new Node(nodeNumber, 1, point);
+                    endNode = new Node(nodeNumber, 0, point);
                 }
                 nodeNumber++;
                 grid[y][x] = charArray[x];
@@ -183,19 +183,13 @@ class Dec16 extends DecBase {
             distance[startNode.number] = 0;
             parents[startNode.number] = NO_PARENT;
 
-            while (visited.size() != totalNodes) {
-                if (pQue.isEmpty()) {
-                    return;
-                }
+            while (!pQue.isEmpty()) {
                 Node ux = pQue.remove();
                 if (visited.contains(ux.number)) {
                     continue;
                 }
                 visited.add(ux.number);
                 eNeighbours(ux);
-                if (visited.contains(endNode.number)) {
-                    break;
-                }
             }
         }
 
@@ -228,28 +222,26 @@ class Dec16 extends DecBase {
         private ArrayList<Node> findNeighbours(Node ux) {
             ArrayList<Node> neighbours = new ArrayList<>(3);
 
-            int newX;
-            int newY;
             switch (ux.point.direction) {
                 case UP -> {
-                    neighbours.addAll(checkDirection(ux, Direction.UP, 0));
-                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 1000));
-                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, 0));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 1000));
                 }
                 case DOWN -> {
-                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 0));
-                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 1000));
-                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 0));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 1000));
                 }
                 case LEFT -> {
-                    neighbours.addAll(checkDirection(ux, Direction.LEFT, 0));
-                    neighbours.addAll(checkDirection(ux, Direction.UP, 1000));
-                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 0));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 1000));
                 }
                 case RIGHT -> {
-                    neighbours.addAll(checkDirection(ux, Direction.RIGHT, 0));
-                    neighbours.addAll(checkDirection(ux, Direction.UP, 1000));
-                    neighbours.addAll(checkDirection(ux, Direction.DOWN, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 0));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 1000));
                 }
             }
             neighbours.trimToSize();
@@ -268,7 +260,7 @@ class Dec16 extends DecBase {
                     .ifPresent(n -> grid[n.point.y][n.point.x] = '0');
         }
 
-        private List<Node> checkDirection(Node ux, Direction direction, final int additionalCost) {
+        private List<Node> getNeighbour(Node ux, Direction direction, final int additionalCost) {
             int newX;
             int newY;
             newX = ux.point.x + direction.mvX;
@@ -278,7 +270,7 @@ class Dec16 extends DecBase {
                     .filter(n -> n.point.x == newX)
                     .filter(n -> n.point.y == newY)
                     .filter(n -> n.point.value != '#')
-                    .map(n -> new Node(n.number, n.price + additionalCost, new Point(newX, newY, n.point.value, direction)))
+                    .map(n -> new Node(n.number, 1 + additionalCost, new Point(newX, newY, n.point.value, direction)))
                     .toList();
         }
 

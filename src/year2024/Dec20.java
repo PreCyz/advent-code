@@ -2,19 +2,8 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -25,6 +14,10 @@ class Dec20 extends DecBase {
     }
 
     record Point(int x, int y, char value) {
+        @Override
+        public String toString() {
+            return "{x=" + x + ", y=" + y + '}';
+        }
     }
 
     enum Direction {
@@ -65,6 +58,16 @@ class Dec20 extends DecBase {
         return this;
     }
 
+    Optional<Point> getWall(Direction direction, ArrayList<Node> nodes, Point path) {
+        return nodes.stream()
+                .filter(n -> n.point.x == path.x + direction.mvX)
+                .filter(n -> n.point.y == path.y + direction.mvY)
+                .filter(n -> n.point.value == '#')
+                .filter(n -> n.point.x >= 0 && n.point.y >= 0)
+                .map(n -> n.point)
+                .findFirst();
+    }
+
     @Override
     protected void calculatePart1() {
         Node start = null, end = null;
@@ -73,7 +76,7 @@ class Dec20 extends DecBase {
         int numberOfNodes = maxY * maxX;
         char[][] grid = new char[maxY][maxX];
         ArrayList<Node> trace = new ArrayList<>(numberOfNodes);
-        ArrayList<Point> walls = new ArrayList<>(numberOfNodes);
+        Set<Point> walls = new HashSet<>(numberOfNodes);
 
         int y = 0;
         int nodeNumber = 0;
@@ -104,10 +107,18 @@ class Dec20 extends DecBase {
         dijkstra2.dijkstra(trace, start);
         int distance = dijkstra2.getDistance(end);
         System.out.printf("Route distance %d%n", distance);
+        dijkstra2.printPath(end.number);
+        walls = new HashSet<>();
+        for (Point point : dijkstra2.path) {
+            getWall(Direction.UP, trace, point).ifPresent(walls::add);
+            getWall(Direction.DOWN, trace, point).ifPresent(walls::add);
+            getWall(Direction.LEFT, trace, point).ifPresent(walls::add);
+            getWall(Direction.RIGHT, trace, point).ifPresent(walls::add);
+        }
 
         AtomicInteger cheatCounter = new AtomicInteger(0);
         Map<Integer, Integer> cheats = new HashMap<>();
-        List<CompletableFuture<Void>> cf= new ArrayList<>(walls.size());
+        List<CompletableFuture<Void>> cf = new ArrayList<>(walls.size());
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         final Node s = start;
         final Node e = end;
@@ -192,16 +203,20 @@ class Dec20 extends DecBase {
         // Total count of the vertices
         private final int totalNodes;
         List<Node> adjacent;
+        Point[] parents;
+        ArrayList<Point> path;
 
         // Constructor of the class
-        public Dijkstra(int totalNodesNumber) {
+        Dijkstra(int totalNodesNumber) {
             this.totalNodes = totalNodesNumber;
             distance = new int[totalNodesNumber];
+            parents = new Point[totalNodesNumber];
             settled = new HashSet<>();
             pQue = new PriorityQueue<>(totalNodesNumber, Node.COMPARATOR);
+            path = new ArrayList<>(totalNodesNumber);
         }
 
-        public void dijkstra(List<Node> adjacent, Node startNode) {
+        void dijkstra(List<Node> adjacent, Node startNode) {
             this.adjacent = adjacent;
 
             for (int j = 0; j < totalNodes; j++) {
@@ -209,6 +224,7 @@ class Dec20 extends DecBase {
             }
             pQue.add(startNode);
             distance[startNode.number] = 0;
+            parents[startNode.number] = null;
 
             while (!pQue.isEmpty()) {
                 Node ux = pQue.remove();
@@ -221,8 +237,7 @@ class Dec20 extends DecBase {
         }
 
         private void processNeighbours(Node ux) {
-            int edgeDist = -1;
-            int newDist = -1;
+            int edgeDist, newDist;
 
             // All neighbors of vx
             for (Node vx : findNeighbours(ux)) {
@@ -234,6 +249,7 @@ class Dec20 extends DecBase {
                     // If the new distance is lesser in the cost
                     if (newDist < distance[vx.number]) {
                         distance[vx.number] = newDist;
+                        parents[vx.number] = ux.point;
                     }
 
                     // Adding the current node to the priority queue pQue
@@ -258,6 +274,28 @@ class Dec20 extends DecBase {
                     .filter(n -> n.point.value != '#')
                     .filter(n -> n.point.x >= 0 && n.point.y >= 0)
                     .findFirst();
+        }
+
+        void printPath(int startVertex) {
+            path = new ArrayList<>(totalNodes);
+            int startIndex = startVertex;
+            while (true) {
+                Point point = parents[startIndex];
+                if (point == null) {
+                    break;
+                }
+                path.add(point);
+                Optional<Node> newNode = adjacent.stream()
+                        .filter(n -> n.point.x == point.x && n.point.y == point.y)
+                        .findFirst();
+                if (newNode.isPresent()) {
+                    startIndex = newNode.get().number;
+                } else {
+                    break;
+                }
+            }
+            path.trimToSize();
+//            System.out.printf("%s", path.stream().map(Record::toString).collect(Collectors.joining("->")));
         }
 
         public void print(int startNodeNumber) {
