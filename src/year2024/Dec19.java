@@ -2,17 +2,19 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Dec19 extends DecBase {
 
     public Dec19(int year) {
-        super(year, 18);
-    }
-
-    record Point(int x, int y) {
+        super(year, 19);
     }
 
     @Override
@@ -41,45 +43,108 @@ class Dec19 extends DecBase {
         ArrayList<String> combinations = new ArrayList<>();
         for (String input : inputStrings) {
             if (input.contains(",")) {
+                towels = new ArrayList<>(Arrays.asList(input.split(", ")));
                 cache = Arrays.stream(input.split(", "))
                         .collect(Collectors.toMap(v -> v, v -> Boolean.TRUE, (v1, v2) -> v1));
             } else if (!input.isEmpty()) {
                 combinations.add(input);
             }
         }
-        long sum = 0;
 
+        towels.sort(Comparator.comparingInt(String::length).reversed());
+
+        long sum = 0;
         for (String combination : combinations) {
-            if (isPossible(combination)) {
+            if (check(combination, towels)) {
+                cache.put(combination, true);
                 sum++;
             }
         }
-
         System.out.printf("Part 1 - Sum %s%n", sum);
     }
 
-    boolean isPossible(String combination) {
+    boolean check(String combination, ArrayList<String> towels) {
         if (cache.containsKey(combination)) {
             return cache.get(combination);
-        } else {
-            for (int i = 1; i < combination.length() - 1; i++) {
-                String split1 = combination.substring(combination.length() - i);
-                String split2 = combination.substring(0, combination.length() - i);
-                if (isPossible(split1)) {
-                    cache.put(split1, Boolean.TRUE);
-                    isPossible(split2);
+        }
+        for (String towel : towels) {
+            String[] split = combination.split(towel);
+            if (split.length == 1) {
+                if (split[0].length() == combination.length()) {
+                    cache.put(split[0], false);
                 } else {
-                    cache.put(split1, Boolean.FALSE);
+                    cache.put(split[0], check(split[0], towels));
+                }
+            } else {
+                boolean result = true;
+                for (String s : split) {
+                    if (!s.isEmpty()) {
+                        boolean check = check(s, towels);
+                        cache.put(s, check);
+                        result &= check;
+                    }
+                }
+                if (result) {
+                    return true;
                 }
             }
         }
-        return false;
+        return cache.getOrDefault(combination, false);
     }
 
     @Override
     protected void calculatePart2() {
+        ArrayList<String> towels = new ArrayList<>();
+        ArrayList<String> combinations = new ArrayList<>();
+        for (String input : inputStrings) {
+            if (input.contains(",")) {
+                towels = new ArrayList<>(Arrays.asList(input.split(", ")));
+                cache = Arrays.stream(input.split(", "))
+                        .collect(Collectors.toMap(v -> v, v -> Boolean.TRUE, (v1, v2) -> v1));
+            } else if (!input.isEmpty()) {
+                combinations.add(input);
+            }
+        }
 
-        System.out.printf("Part 2%n");
+        towels.sort(Comparator.comparingInt(String::length).reversed());
+
+        long sum = 0;
+        for (String combination : combinations) {
+            if (check(combination, towels)) {
+                cache.put(combination, true);
+                sum++;
+            }
+        }
+        System.out.printf("Part 2 - Sum %s%n", sum);
+    }
+
+    boolean check(String combination, ArrayList<String> towels) {
+        if (cache.containsKey(combination)) {
+            return cache.get(combination);
+        }
+        for (String towel : towels) {
+            String[] split = combination.split(towel);
+            if (split.length == 1) {
+                if (split[0].length() == combination.length()) {
+                    cache.put(split[0], false);
+                } else {
+                    cache.put(split[0], check(split[0], towels));
+                }
+            } else {
+                boolean result = true;
+                for (String s : split) {
+                    if (!s.isEmpty()) {
+                        boolean check = check(s, towels);
+                        cache.put(s, check);
+                        result &= check;
+                    }
+                }
+                if (result) {
+                    return true;
+                }
+            }
+        }
+        return cache.getOrDefault(combination, false);
     }
 
 }
