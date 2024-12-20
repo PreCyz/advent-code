@@ -25,7 +25,8 @@ public class Main2024 {
 //                new Dec15(2024),
 //                new Dec16(2024),
 //                new Dec17(2024),
-                new Dec18(2024)
+//                new Dec18(2024)
+                new Dec20(2024)
         );
 
         String cookieSession = args[0];
