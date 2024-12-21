@@ -4,14 +4,10 @@ import utils.Utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class DecBase implements Runnable {
     protected LinkedList<String> inputStrings = new LinkedList<>();
@@ -65,7 +61,11 @@ public abstract class DecBase implements Runnable {
 
     private void printDuration(LocalDateTime start) {
         Duration duration = Duration.between(start, LocalDateTime.now());
-        if (duration.toMinutes() > 0) {
+        if (duration.toHours() > 0) {
+            System.out.printf("Duration %d[h]:%d[m]:%d[s]:%d[ms]%n",
+                    duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
+            );
+        } else if (duration.toMinutes() > 0) {
             System.out.printf("Duration %d[m]:%d[s]:%d[ms]%n",
                     duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
             );
@@ -73,10 +73,8 @@ public abstract class DecBase implements Runnable {
             System.out.printf("Duration %d[s]:%d[ms]%n", duration.toSecondsPart(), duration.toMillisPart());
         } else if (duration.toMillis() > 0) {
             System.out.printf("Duration %d[ms]%n", duration.toMillisPart());
-        } else {
-            if (duration.toNanosPart() > 0) {
-                System.out.printf("Duration %d[ns]%n", duration.toNanosPart());
-            }
+        } else if (duration.toNanosPart() > 0) {
+            System.out.printf("Duration %d[ns]%n", duration.toNanosPart());
         }
     }
 
@@ -85,6 +83,7 @@ public abstract class DecBase implements Runnable {
     }
 
     public abstract DecBase readDefaultInput();
+
     protected abstract void calculatePart1();
 
     public static void runTasks(List<DecBase> adventTasks, String cookieSession) {

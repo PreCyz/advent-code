@@ -103,11 +103,14 @@ class Dec20 extends DecBase {
             y++;
         }
         trace.trimToSize();
+
         Dijkstra dijkstra2 = new Dijkstra(trace.size());
         dijkstra2.dijkstra(trace, start);
         int distance = dijkstra2.getDistance(end);
         System.out.printf("Route distance %d%n", distance);
         dijkstra2.printPath(end.number);
+        System.out.println();
+
         walls = new HashSet<>();
         for (Point point : dijkstra2.path) {
             getWall(Direction.UP, trace, point).ifPresent(walls::add);

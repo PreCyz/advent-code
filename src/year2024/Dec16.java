@@ -110,12 +110,11 @@ class Dec16 extends DecBase {
         }
 
         Dijkstra dijkstra = new Dijkstra(inputStrings.size() * inputStrings.getFirst().length());
-        dijkstra.dijkstra(maze, startNode, endNode);
+        dijkstra.dijkstra(maze, startNode);
         int distance = dijkstra.getDistance(endNode);
 //        dijkstra.printPath(endNode.number, grid);
         GridUtils.writeToFile(grid);
 
-        long sum = 0;
 //        107476
 //        106476
         System.out.printf("Part 1 - Sum %d%n", distance);
@@ -172,7 +171,7 @@ class Dec16 extends DecBase {
             parents = new int[totalNodes];
         }
 
-        public void dijkstra(List<List<Node>> adjacent, Node startNode, Node endNode) {
+        public void dijkstra(List<List<Node>> adjacent, Node startNode) {
             this.adjacent = adjacent;
 
             for (int j = 0; j < totalNodes; j++) {
@@ -194,8 +193,7 @@ class Dec16 extends DecBase {
         }
 
         private void eNeighbours(Node ux) {
-            int edgeDist = -1;
-            int newDist = -1;
+            int edgeDist, newDist;
 
             // All neighbors of vx
             for (Node vx : findNeighbours(ux)) {
@@ -221,31 +219,44 @@ class Dec16 extends DecBase {
 
         private ArrayList<Node> findNeighbours(Node ux) {
             ArrayList<Node> neighbours = new ArrayList<>(3);
+            int noRotation = 0;
+            int rotation = 1000;
 
             switch (ux.point.direction) {
                 case UP -> {
-                    neighbours.addAll(getNeighbour(ux, Direction.UP, 0));
-                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 1000));
-                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, noRotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, rotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, rotation));
                 }
                 case DOWN -> {
-                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 0));
-                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 1000));
-                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, noRotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, rotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, rotation));
                 }
                 case LEFT -> {
-                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, 0));
-                    neighbours.addAll(getNeighbour(ux, Direction.UP, 1000));
-                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.LEFT, noRotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, rotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, rotation));
                 }
                 case RIGHT -> {
-                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, 0));
-                    neighbours.addAll(getNeighbour(ux, Direction.UP, 1000));
-                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, 1000));
+                    neighbours.addAll(getNeighbour(ux, Direction.RIGHT, noRotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.UP, rotation));
+                    neighbours.addAll(getNeighbour(ux, Direction.DOWN, rotation));
                 }
             }
             neighbours.trimToSize();
             return neighbours;
+        }
+
+        private List<Node> getNeighbour(Node ux, Direction direction, final int additionalCost) {
+            int newX = ux.point.x + direction.mvX;
+            int newY = ux.point.y + direction.mvY;
+            return adjacent.stream()
+                    .flatMap(List::stream)
+                    .filter(n -> n.point.x == newX && n.point.y == newY)
+                    .filter(n -> n.point.value != '#')
+                    .map(n -> new Node(n.number, 1 + additionalCost, new Point(newX, newY, n.point.value, direction)))
+                    .toList();
         }
 
         void printPath(int startVertex, char[][] grid) {
@@ -258,26 +269,6 @@ class Dec16 extends DecBase {
                     .filter(n -> n.number == startVertex)
                     .findFirst()
                     .ifPresent(n -> grid[n.point.y][n.point.x] = '0');
-        }
-
-        private List<Node> getNeighbour(Node ux, Direction direction, final int additionalCost) {
-            int newX;
-            int newY;
-            newX = ux.point.x + direction.mvX;
-            newY = ux.point.y + direction.mvY;
-            return adjacent.stream()
-                    .flatMap(List::stream)
-                    .filter(n -> n.point.x == newX)
-                    .filter(n -> n.point.y == newY)
-                    .filter(n -> n.point.value != '#')
-                    .map(n -> new Node(n.number, 1 + additionalCost, new Point(newX, newY, n.point.value, direction)))
-                    .toList();
-        }
-
-        public void print(int startNodeNumber) {
-            for (int j = 0; j < distance.length; j++) {
-                System.out.printf("%d to %d is %d%n", startNodeNumber, j, distance[j]);
-            }
         }
 
         public int getDistance(Node destinationNode) {
