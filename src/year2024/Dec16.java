@@ -12,12 +12,29 @@ class Dec16 extends DecBase {
         super(year, 16);
     }
 
-    record Point(int x, int y, char value, Direction direction) {
-        public String toString2() {
-            return "Point{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
+    record Point(int x, int y, char value, Direction direction) { }
+
+    static class Node implements Comparator<Node> {
+
+        static Comparator<Node> COMPARATOR = Comparator.comparingInt(o -> o.cost);
+        int number;
+        int cost;
+        Point point;
+
+        Node(int number, int cost, Point point) {
+            this.number = number;
+            this.cost = cost;
+            this.point = point;
+        }
+
+        @Override
+        public int compare(Node n1, Node n2) {
+            return COMPARATOR.compare(n1, n2);
+        }
+
+        @Override
+        public String toString() {
+            return "Node{number=" + number + ", cost=" + cost + ", point=" + point + '}';
         }
     }
 
@@ -61,32 +78,14 @@ class Dec16 extends DecBase {
         return this;
     }
 
-    enum Direction {
-        UP(0, -1, '^'),
-        DOWN(0, 1, 'v'),
-        LEFT(-1, 0, '<'),
-        RIGHT(1, 0, '>');
-
-        final int mvX;
-        final int mvY;
-        final char c;
-
-        Direction(int mvX, int mvY, char c) {
-            this.mvX = mvX;
-            this.mvY = mvY;
-            this.c = c;
-        }
-    }
-
     @Override
     protected void calculatePart1() {
         Node startNode = null, endNode = null;
-        List<List<Node>> maze = new ArrayList<>(inputStrings.size());
+        List<Node> maze = new ArrayList<>(inputStrings.size());
         int y = 0;
         int nodeNumber = 0;
         char[][] grid = new char[inputStrings.size()][inputStrings.getFirst().length()];
         for (String input : inputStrings) {
-            ArrayList<Node> row = new ArrayList<>(input.length());
             char[] charArray = input.toCharArray();
             for (int x = 0; x < input.length(); x++) {
                 Point point = new Point(x, y, charArray[x], null);
@@ -94,7 +93,7 @@ class Dec16 extends DecBase {
                 if (charArray[x] == '#') {
                     node = new Node(nodeNumber, 0, point);
                 }
-                row.add(node);
+                maze.add(node);
 
                 if (charArray[x] == 'S') {
                     startNode = new Node(nodeNumber, 0, new Point(x, y, charArray[x], Direction.LEFT));
@@ -106,18 +105,35 @@ class Dec16 extends DecBase {
                 grid[y][x] = charArray[x];
             }
             y++;
-            maze.add(row);
         }
 
         Dijkstra dijkstra = new Dijkstra(inputStrings.size() * inputStrings.getFirst().length());
         dijkstra.dijkstra(maze, startNode);
         int distance = dijkstra.getDistance(endNode);
-//        dijkstra.printPath(endNode.number, grid);
+        dijkstra.updateGrid(endNode, grid);
         GridUtils.writeToFile(grid);
 
 //        107476
 //        106476
         System.out.printf("Part 1 - Sum %d%n", distance);
+
+        dijkstra.calculatePath(endNode);
+        Map<Integer, Direction> map = new HashMap<>();
+        Direction prev = null;
+        int turns = 0;
+        for (Point point : dijkstra.path.reversed()) {
+            Direction current = point.direction;
+            if (prev == null || prev != current) {
+                map.put(++turns, point.direction);
+            }
+            prev = current;
+        }
+/*        map.forEach((k, v) -> {
+            System.out.printf("%s -> ", v);
+        });
+        System.out.println("END");*/
+        int sum = dijkstra.path.size() + (turns - 1) * 1000;
+        System.out.printf("Steps: %d, Turns: %d Distance: %d%n", dijkstra.path.size(), turns - 1, sum);
     }
 
     @Override
@@ -126,52 +142,25 @@ class Dec16 extends DecBase {
 //        System.out.printf("Part 2 - Sum[%b] %d%n", move, move);
     }
 
-    static class Node implements Comparator<Node> {
-
-        int number;
-        int price;
-        Point point;
-
-        Node(int number, int price, Point point) {
-            this.number = number;
-            this.price = price;
-            this.point = point;
-        }
-
-        @Override
-        public int compare(Node n1, Node n2) {
-            return Integer.compare(n1.price, n2.price);
-        }
-
-        static Comparator<Node> COMPARATOR = Comparator.comparingInt(o -> o.price);
-
-        @Override
-        public String toString() {
-            return "Node{number=" + number + ", price=" + price + ", point=" + point + '}';
-        }
-    }
-
     static class Dijkstra {
-
-        private static final int NO_PARENT = -1;
-
+        private final int totalNodes;
         private final int[] distance;
         private final Set<Integer> visited;
         private final PriorityQueue<Node> pQue;
 
-        private final int totalNodes;
-        List<List<Node>> adjacent;
-        int[] parents;
+        List<Node> adjacent;
+        Point[] parents;
+        ArrayList<Point> path;
 
         public Dijkstra(int totalNodes) {
             this.totalNodes = totalNodes;
             distance = new int[totalNodes];
             visited = new HashSet<>();
             pQue = new PriorityQueue<>(totalNodes, Node.COMPARATOR);
-            parents = new int[totalNodes];
+            parents = new Point[totalNodes];
         }
 
-        public void dijkstra(List<List<Node>> adjacent, Node startNode) {
+        public void dijkstra(List<Node> adjacent, Node startNode) {
             this.adjacent = adjacent;
 
             for (int j = 0; j < totalNodes; j++) {
@@ -180,7 +169,7 @@ class Dec16 extends DecBase {
 
             pQue.add(startNode);
             distance[startNode.number] = 0;
-            parents[startNode.number] = NO_PARENT;
+            parents[startNode.number] = null;
 
             while (!pQue.isEmpty()) {
                 Node ux = pQue.remove();
@@ -188,30 +177,20 @@ class Dec16 extends DecBase {
                     continue;
                 }
                 visited.add(ux.number);
-                eNeighbours(ux);
+                processNeighbours(ux);
             }
         }
 
-        private void eNeighbours(Node ux) {
-            int edgeDist, newDist;
-
-            // All neighbors of vx
+        private void processNeighbours(Node ux) {
             for (Node vx : findNeighbours(ux)) {
-                // If the current node hasn't been already processed
                 if (!visited.contains(vx.number)) {
-                    edgeDist = vx.price;
-                    newDist = distance[ux.number] + edgeDist;
+                    int edgeDist = vx.cost;
+                    int newDist = distance[ux.number] + edgeDist;
 
-                    // If the new distance is lesser in the cost
                     if (newDist < distance[vx.number]) {
                         distance[vx.number] = newDist;
-                        parents[vx.number] = ux.number;
-                        /*System.out.printf("%d(%d,%d) -> %d(%d,%d) [%d]%n",
-                                ux.number, ux.point.x, ux.point.y,
-                                vx.number, vx.point.x, vx.point.y, newDist);*/
+                        parents[vx.number] = ux.point;
                     }
-
-                    // Adding the current node to the priority queue pQue
                     pQue.add(new Node(vx.number, distance[vx.number], vx.point));
                 }
             }
@@ -252,23 +231,52 @@ class Dec16 extends DecBase {
             int newX = ux.point.x + direction.mvX;
             int newY = ux.point.y + direction.mvY;
             return adjacent.stream()
-                    .flatMap(List::stream)
-                    .filter(n -> n.point.x == newX && n.point.y == newY)
                     .filter(n -> n.point.value != '#')
+                    .filter(n -> n.point.x == newX)
+                    .filter(n -> n.point.y == newY)
                     .map(n -> new Node(n.number, 1 + additionalCost, new Point(newX, newY, n.point.value, direction)))
                     .toList();
         }
 
-        void printPath(int startVertex, char[][] grid) {
-            if (startVertex == NO_PARENT || parents[startVertex] == Integer.MAX_VALUE) {
-                return;
+        void calculatePath(Node node) {
+            path = new ArrayList<>(totalNodes);
+            int startIndex = node.number;
+            while (true) {
+                Point point = parents[startIndex];
+                if (point == null) {
+                    break;
+                }
+                path.add(point);
+                Optional<Node> newNode = adjacent.stream()
+                        .filter(n -> n.point.x == point.x && n.point.y == point.y)
+                        .findFirst();
+                if (newNode.isPresent()) {
+                    startIndex = newNode.get().number;
+                } else {
+                    break;
+                }
             }
-            printPath(parents[startVertex], grid);
-            adjacent.stream()
-                    .flatMap(List::stream)
-                    .filter(n -> n.number == startVertex)
-                    .findFirst()
-                    .ifPresent(n -> grid[n.point.y][n.point.x] = '0');
+            path.trimToSize();
+//            System.out.printf("%s", path.stream().map(Record::toString).collect(Collectors.joining("->")));
+        }
+
+        void updateGrid(Node node, char[][] grid) {
+            int startIndex = node.number;
+            while (true) {
+                Point point = parents[startIndex];
+                if (point == null) {
+                    break;
+                }
+                grid[point.y][point.x] = '0';
+                Optional<Node> newNode = adjacent.stream()
+                        .filter(n -> n.point.x == point.x && n.point.y == point.y)
+                        .findFirst();
+                if (newNode.isPresent()) {
+                    startIndex = newNode.get().number;
+                } else {
+                    break;
+                }
+            }
         }
 
         public int getDistance(Node destinationNode) {

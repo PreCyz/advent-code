@@ -2,12 +2,7 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,7 +113,7 @@ class Dec19 extends DecBase {
         System.out.printf("Part 2 - Sum %s%n", sum);
     }
 
-    boolean check(String combination, ArrayList<String> towels) {
+    boolean check2(String combination, ArrayList<String> towels) {
         if (cache.containsKey(combination)) {
             return cache.get(combination);
         }

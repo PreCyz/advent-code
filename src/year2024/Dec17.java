@@ -4,11 +4,9 @@ import base.DecBase;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Dec17 extends DecBase {
-
 
     public Dec17(int year) {
         super(year, 17);
@@ -70,9 +68,7 @@ class Dec17 extends DecBase {
         adv {
             @Override
             void execute(Register register, Operand combo) {
-                long numerator = register.A;
-                double denominator = Math.pow(2, combo.combo());
-                register.A = (int) (numerator / denominator);
+                register.A = register.A >> combo.combo();
                 register.instructionPointer += 2;
             }
         },
@@ -86,18 +82,7 @@ class Dec17 extends DecBase {
         bst {
             @Override
             void execute(Register register, Operand operand) {
-                long modulo8 = operand.combo() % 8;
-                String result = "00" + Long.toBinaryString(modulo8);
-                result = result.substring(result.length() - 3);
-                int ans = 0, i, p = 0;
-                int len = result.length();
-                for (i = len - 1; i >= 0; i--) {
-                    if (result.charAt(i) == '1') {
-                        ans += (int) Math.pow(2, p);
-                    }
-                    p++;
-                }
-                register.B = ans;
+                register.B = operand.combo() % 8;
                 register.instructionPointer += 2;
             }
         },
@@ -128,18 +113,14 @@ class Dec17 extends DecBase {
         bdv {
             @Override
             void execute(Register register, Operand operand) {
-                long numerator = register.A;
-                double denominator = Math.pow(2, operand.combo());
-                register.B = (int) (numerator / denominator);
+                register.B = register.A >> operand.combo();
                 register.instructionPointer += 2;
             }
         },
         cdv {
             @Override
             void execute(Register register, Operand operand) {
-                long numerator = register.A;
-                double denominator = Math.pow(2, operand.combo());
-                register.C = (int) (numerator / denominator);
+                register.C = register.A >> operand.combo();
                 register.instructionPointer += 2;
             }
         };
@@ -196,54 +177,53 @@ class Dec17 extends DecBase {
             ins.execute(register, operand);
         } while(register.instructionPointer < program.length);
 
+        //2,0,7,3,0,3,1,3,7
         System.out.printf("Part 1 - Sum %s%n", register.output());
     }
 
     @Override
     protected void calculatePart2() {
-        //2,0,7,3,0,3,1,3,7
-        long initialA = 0;
-        long initialB = 0;
-        long initialC = 0;
         Integer[] program = new Integer[]{};
         for (String input : inputStrings) {
-            if (input.startsWith("Register A: ")) {
-                initialA = Long.parseLong(input.replace("Register A: ", ""));
-            } else if (input.startsWith("Register B: ")) {
-                initialB = Long.parseLong(input.replace("Register B: ", ""));
-            } else if (input.startsWith("Register C: ")) {
-                initialC = Long.parseLong(input.replace("Register C: ", ""));
-            } else if (input.startsWith("Program: ")) {
-                program = Arrays.stream(input.replace("Program: ", "").split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+            if (input.startsWith("Program: ")) {
+                program = Arrays.stream(input.replace("Program: ", "").split(","))
+                        .map(Integer::parseInt)
+                        .toArray(Integer[]::new);
             }
         }
+//        2,4,1,1,7,5,0,3,4,3,1,6,5,5,3,0
 
-        String programValue = Arrays.stream(program).map(String::valueOf).collect(Collectors.joining(","));
-        long sum = 0;
+        // 2,4 -> b = a % 8
+        // 1,1 -> b = b ^ 1
+        // 7,5 -> c = a >> b
+        // 0,3 -> a = a >> 3
+        // 4,3 -> b = b ^ c
+        // 1,6 -> b = b ^ 6
+        // 5,5 -> out(b % 8)
+        // 3,0 -> if (a != 0) jump: 0
 
-//        for (long i = Integer.MAX_VALUE - 1; i >= 0; i--) {
-        for (long i = 580000000; i >= 0; i--) {
-            Register register = new Register(i, initialB, initialC);
-            if (i == initialA) {
-                continue;
-            }
-            try {
-                register.A = i;
-                do {
-                    Instruction ins = Instruction.ins(program[register.instructionPointer]);
-                    Operand operand = new Operand(program[register.instructionPointer + 1], register);
-                    ins.execute(register, operand);
-                } while (register.instructionPointer < program.length);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-            if (register.output().equals(programValue)) {
-                sum = i;
-                break;
-            }
-            if (i % 2_500_000 == 0) System.out.printf("%d%n", i);
+        System.out.printf("Part 2 - Sum %s%n", find(program, 0));
+    }
+
+    int find(Integer[] program, int instrValue) {
+        if (program.length == 0) {
+            return instrValue;
         }
-
-        System.out.printf("Part 2 - Sum %d%n", sum);
+        for (int j = 0; j < 8; j++) {
+            int a = instrValue + j;
+            int b = j % 8;
+            b = b ^ 1;
+            int c = a >> b;
+            a = a >> 3;
+            b = b ^ c;
+            b = b ^ 6;
+            if (b % 8 == program[program.length - 1]) {
+                a = j;
+                int sub = find(Arrays.copyOfRange(program, 0, program.length - 1), a);
+                if (sub == -1) continue;
+                return sub;
+            }
+        }
+        return -1;
     }
 }
