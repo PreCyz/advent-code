@@ -2,18 +2,10 @@ package year2024;
 
 import base.DecBase;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -92,7 +84,7 @@ class Dec22 extends DecBase {
         Map<Long, List<PriceChange>> buyerSequenceMap = new ConcurrentHashMap<>();
         Map<Integer, Set<List<Integer>>> priceSequenceMap = new ConcurrentHashMap<>();
         for (int i = 0; i < 10; i++) {
-            priceSequenceMap.put(i, new HashSet<>());
+            priceSequenceMap.put(i, new CopyOnWriteArraySet<>());
         }
 
         int available = Runtime.getRuntime().availableProcessors();
@@ -100,7 +92,7 @@ class Dec22 extends DecBase {
             List<CompletableFuture<Void>> tasks = new ArrayList<>(inputStrings.size());
             for (String secret : inputStrings) {
 
-//                tasks.add(CompletableFuture.runAsync(() -> {
+                tasks.add(CompletableFuture.runAsync(() -> {
 
                     long initialSecret = Long.parseLong(secret);
                     int currentDigit = lastDigit(initialSecret);
@@ -119,56 +111,74 @@ class Dec22 extends DecBase {
 
                     buyerSequenceMap.put(Long.parseLong(secret), priceChanges);
 
-                    for (Integer price : priceChanges.stream().map(pc -> pc.currentDigit).collect(Collectors.toSet())) {
+                    for (Integer price : priceChanges.stream()
+                            .map(pc -> pc.currentDigit)
+                            .collect(Collectors.toSet())) {
                         priceSequenceMap.get(price).addAll(sequencesForPrice(price, priceChanges));
                     }
 
-//                }, exe));
+                }, exe));
 
             }
 
-            /*CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]))
-                    .whenComplete((r, t) ->
-                            System.out.printf("Creating maps for initial secrets completed. total sequence size = [%d] priceSequenceMap.values.size [%d]%n",
-                                    buyerSequenceMap.values().stream().mapToInt(Collection::size).sum(),
-                                    priceSequenceMap.values().stream().mapToLong(Collection::size).sum())
+            final LocalDateTime start = LocalDateTime.now();
+
+            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]))
+                    .whenComplete((r, t) -> {
+                                Duration duration = Duration.between(start, LocalDateTime.now());
+                                System.out.printf("Creating maps for initial secrets completed. total sequence size = [%d] " +
+                                                "priceSequenceMap.values.size [%d] within %dm:%ds.%n",
+                                        buyerSequenceMap.values().stream().mapToInt(Collection::size).sum(),
+                                        priceSequenceMap.values().stream().mapToLong(Collection::size).sum(),
+                                        duration.toMinutesPart(), duration.toSecondsPart());
+                            }
                     )
-                    .join();*/
+                    .join();
 
             tasks.clear();
 
             Map<String, Long> result = new ConcurrentHashMap<>();
             for (Map.Entry<Integer, Set<List<Integer>>> entry : priceSequenceMap.entrySet()) {
 
-                tasks.add(CompletableFuture.runAsync(() -> {
+                tasks.add(CompletableFuture.supplyAsync(() -> {
 
-                            for (List<Integer> sequence : entry.getValue()) {
+                                LocalDateTime startTime = LocalDateTime.now();
+                                for (List<Integer> sequence : entry.getValue()) {
 
-                                for (Map.Entry<Long, List<PriceChange>> buyerSequenceEntry : buyerSequenceMap.entrySet()) {
-                                    getPrice(buyerSequenceEntry.getValue(), sequence).ifPresent(
-                                            price -> {
-                                                String key = entry.getKey() + "-> " + sequence.stream().map(Object::toString).collect(Collectors.joining(","));
-                                                if (result.containsKey(key)) {
-                                                    result.put(key, result.get(key) + price);
-                                                } else {
-                                                    result.put(key, Long.valueOf(price));
+                                    for (Map.Entry<Long, List<PriceChange>> buyerSequenceEntry : buyerSequenceMap.entrySet()) {
+                                        getPrice(buyerSequenceEntry.getValue(), sequence).ifPresent(
+                                                price -> {
+                                                    String key = entry.getKey() + "-> " + sequence.stream()
+                                                                    .map(Object::toString)
+                                                                    .collect(Collectors.joining(","));
+
+                                                    if (result.containsKey(key)) {
+                                                        result.put(key, result.get(key) + price);
+                                                    } else {
+                                                        result.put(key, Long.valueOf(price));
+                                                    }
                                                 }
-                                            }
-                                    );
-                                }
+                                        );
+                                    }
 
-                            }
-                        }, exe
-                    )
-                    .whenComplete((r, t) ->
-                            System.out.printf("Entry with key [%d] with list of patterns size [%d] for [%d] buyers completed.%n",
-                                    entry.getKey(), entry.getValue().size(), buyerSequenceMap.size())
-                    )
+                                }
+                                return start;
+
+                            }, exe
+                        ).thenAccept(startTime -> {
+                            Duration duration = Duration.between(startTime, LocalDateTime.now());
+                            System.out.printf("Entry with key [%d] with list of patterns size [%d] for [%d] buyers " +
+                                            "completed within %dm:%ds.%n",
+                                    entry.getKey(), entry.getValue().size(), buyerSequenceMap.size(),
+                                    duration.toMinutesPart(), duration.toSecondsPart());
+                        })
                 );
 
             }
 
-            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
+            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]))
+                    .whenComplete((r, t) -> System.out.println("All processed"))
+                    .join();
 //            result.forEach((key, value) -> System.out.printf("%s -> %s%n", key, value));
 
             long max = result.values().stream().mapToLong(Long::valueOf).max().getAsLong();
