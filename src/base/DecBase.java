@@ -33,6 +33,17 @@ public abstract class DecBase implements Runnable {
         return this;
     }
 
+    protected char[][] grid() {
+        char[][] grid = new char[inputStrings.size()][inputStrings.getFirst().length()];
+        int y = 0;
+        for (String input : inputStrings) {
+            char[] charArray = input.toCharArray();
+            System.arraycopy(charArray, 0, grid[y], 0, input.length());
+            y++;
+        }
+        return grid;
+    }
+
     private String getFileName() {
         return "%d.txt".formatted(day);
     }
