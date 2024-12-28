@@ -3,6 +3,7 @@ package year2024;
 import base.DecBase;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Dec23 extends DecBase {
@@ -53,109 +54,98 @@ class Dec23 extends DecBase {
 
     @Override
     protected void calculatePart1() {
-        Set<String> computers = new HashSet<>();
+        Map<String, Set<String>> computers = new HashMap<>();
         for (String input : inputStrings) {
             String[] split = input.split("-");
-            computers.add(split[0]);
-            computers.add(split[1]);
+            if (computers.containsKey(split[0])) {
+                computers.get(split[0]).add(split[1]);
+            } else {
+                computers.putIfAbsent(split[0], new HashSet<>(Set.of(split[1])));
+            }
+            if (computers.containsKey(split[1])) {
+                computers.get(split[1]).add(split[0]);
+            } else {
+                computers.putIfAbsent(split[1], new HashSet<>(Set.of(split[0])));
+            }
         }
-        Set<Set<String>> groups = new HashSet<>();
-        for (String computer : computers) {
-            Set<String> group = new HashSet<>();
-            group.add(computer);
-            Set<String> later = new HashSet<>();
-            for (String connection : inputStrings) {
-                if (connection.contains(computer)) {
-                    var comps = connection.split("-");
-                    if (comps[0].equals(computer)) {
-                        later.add(comps[1]);
-                    } else {
-                        later.add(comps[0]);
+
+        Set<String> tmp = new HashSet<>(computers.keySet());
+
+        Set<Set<String>> groups = new LinkedHashSet<>();
+        for (String comp : computers.keySet()) {
+            var set1 = computers.get(comp);
+            tmp.remove(comp);
+            for (String comp2 : tmp) {
+                if (!set1.contains(comp2)) {continue;}
+                var set2 = new HashSet<>(computers.get(comp2));
+                set2.retainAll(set1);
+                for (String c : set2) {
+                    if (computers.get(c).containsAll(Set.of(comp, comp2))) {
+                        groups.add(new HashSet<>(Set.of(comp, comp2, c)));
                     }
                 }
             }
-            if (later.size() > 1) {
-                group.addAll(getConnections(later));
-            }
-            groups.add(group);
         }
 
         long sum = 0;
         for (Set<String> set : groups) {
-            sum += set.stream().filter(s -> s.startsWith("t")).count();
+            if (set.stream().anyMatch(s -> s.startsWith("t"))) {
+                sum++;
+            }
         }
-
         System.out.printf("Part 1 - Sum %s%n", sum);
-    }
-
-    /*private void belongedToGroup(Set<String> later, Set<String> group) {
-        LinkedList<String> comps = new LinkedList<>(later);
-        for (String connection : inputStrings) {
-            if (connection.contains(comps.getFirst()) && connection.contains(comps.getLast())) {
-                if (group.size() > 1) {
-                    for (String comp : group) {
-                        boolean isPartOfGroup = true;
-                        for (String s : group) {
-                            isPartOfGroup &= isConnected(comp, s);
-                            if (!isPartOfGroup) {
-                                break;
-                            }
-                        }
-
-
-                    }
-
-                } else {
-                    group.add(comps.getFirst());
-                    group.add(comps.getLast());
-                }
-                break;
-            }
-        }
-    }
-
-    boolean isConnected(String comp1, String comp2) {
-        for (String connection : inputStrings) {
-            if (connection.contains(comp1) && connection.contains(comp2)) {
-                return true;
-            }
-        }
-        return false;
-    }*/
-
-    Set<String> getConnections(Set<String> later) {
-        Set<String> result = new HashSet<>();
-        Set<String> compi = new HashSet<>(later);
-        Set<String> compj = new HashSet<>(later);
-        Iterator<String> iterator = compi.iterator();
-        while (iterator.hasNext() && !compj.isEmpty()) {
-            String comp1 = iterator.next();
-            compj.remove(comp1);
-            int size = result.size();
-            Set<String> tmp = new HashSet<>(compj);
-            for (String comp2 : compj) {
-                for (String connection : inputStrings) {
-                    if (connection.contains(comp1) && connection.contains(comp2)) {
-                        result.add(comp1);
-                        result.add(comp2);
-                        tmp.remove(comp2);
-                        break;
-                    }
-                }
-                if (result.size() != size) {
-                    break;
-                }
-            }
-            if (result.size() != size) {
-                compj = new HashSet<>(tmp);
-            }
-        }
-        return result;
     }
 
     @Override
     protected void calculatePart2() {
+        Map<String, Set<String>> computers = new HashMap<>();
+        for (String input : inputStrings) {
+            String[] split = input.split("-");
+            if (computers.containsKey(split[0])) {
+                computers.get(split[0]).add(split[1]);
+            } else {
+                computers.putIfAbsent(split[0], new HashSet<>(Set.of(split[1])));
+            }
+            if (computers.containsKey(split[1])) {
+                computers.get(split[1]).add(split[0]);
+            } else {
+                computers.putIfAbsent(split[1], new HashSet<>(Set.of(split[0])));
+            }
+        }
 
-//            System.out.printf("Part 2 - Sum %s%n", max);
+
+        int score = Integer.MIN_VALUE;
+        Set<String> group = new TreeSet<>(String::compareTo);
+
+        for (String comp : computers.keySet()) {
+            var set1 = new HashSet<>(computers.get(comp));
+
+            LinkedHashMap<String, Integer> scoreMap = new LinkedHashMap<>(set1.stream().collect(Collectors.toMap(v -> v, v -> 1)));
+
+            var tmp = new HashSet<>(computers.get(comp));
+            for (String comp2 : set1) {
+                tmp.remove(comp2);
+                for (String c : tmp) {
+                    if (computers.get(comp2).contains(c)) {
+                        scoreMap.put(comp2, scoreMap.get(comp2) + 1);
+                        scoreMap.put(c, scoreMap.get(c) + 1);
+                    }
+                }
+            }
+            int count = scoreMap.entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue)).values().stream().mapToInt(List::size).max().orElse(0);
+            Map<Integer, List<Map.Entry<String, Integer>>> collect = scoreMap.entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue));
+            Integer maxOccurrence = collect.entrySet().stream().filter(e -> e.getValue().size() == count).findFirst().get().getKey();
+            if (count * maxOccurrence > score) {
+                score = count * maxOccurrence;
+                int finalMaxScore = maxOccurrence;
+                group = new TreeSet<>(String::compareTo);
+                group.addAll(scoreMap.entrySet().stream().filter(e -> e.getValue() == finalMaxScore).map(Map.Entry::getKey).collect(Collectors.toSet()));
+                group.add(comp);
+                System.out.printf("group %s score is %s%n", comp, scoreMap);
+                System.out.printf("%s max occurrence:[%d] appears [%d]%n", comp, maxOccurrence, count);
+            }
+        }
+
+        System.out.printf("Part 2 - Sum %s%n", String.join(",", group));
     }
 }
